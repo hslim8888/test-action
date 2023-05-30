@@ -43,13 +43,13 @@ jobs:
         id: new_tag
         run: |
           echo ::set-output name=username::$(echo ${{ steps.get_tag.outputs.tag }} | cut -d'-' -f4)
-          echo ::set-output name=tag::$(echo ${{ steps.get_latest_tag.outputs.tag }} | cut -d'-' -f2-3)
+          echo ::set-output name=tag::$(echo ${{ steps.get_tag.outputs.tag }} | cut -d'-' -f2-3)
       - name: print new tag
         run: |
           echo ${{ steps.new_tag.outputs.tag }}
           echo ${{ steps.new_tag.outputs.username }}
 
-      - name: Get commit lists between latest released tag and new tag
+      - name: Get commit lists between lasplit_tagtest released tag and new tag
         if: ${{ steps.get_latest_tag.outputs.released-tag != '' }}
         id: get_commit_lists
         run: |
@@ -58,8 +58,8 @@ jobs:
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.split_tag.outputs.tag }}
-          name: Release ${{ steps.split_tag.outputs.tag }}
+          tag: ${{ steps.new_tag.outputs.tag }}
+          name: Release ${{ steps.new_tag.outputs.tag }}
           body: >
             [compare link](https://github.com/hslim8888/test-action/compare/${{ steps.get_latest_tag.outputs.released-tag }}...${{ steps.new_tag.outputs.tag }})) 
             ${{ steps.get_commit_lists.outputs.commit-lists || ''}}
