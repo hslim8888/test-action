@@ -62,5 +62,5 @@ jobs:
           name: Release ${{ steps.new_tag.outputs.tag }}
           body: >
             [compare link](https://github.com/hslim8888/test-action/compare/${{ steps.get_latest_tag.outputs.released-tag }}...${{ steps.new_tag.outputs.tag }})) 
-            ${{ steps.get_commit_lists.outputs.commit-lists || ''}}
+            ${{ steps.get_commit_lists.outputs.commit-lists }}
             deploy by @${{ steps.new_tag.outputs.username }}
