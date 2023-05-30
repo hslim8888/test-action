@@ -34,6 +34,7 @@ jobs:
 
       - name: print current branch
         run: |
+          git checkout main
           git branch --show-current
           echo ${{ github.head_ref }}
           echo ${{ github.base_ref }}
