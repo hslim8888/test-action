@@ -1,0 +1,50 @@
+name: Create Release
+on:
+  push:
+    tags:
+      - 'production*'
+
+jobs:
+  release:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+
+      - name: Get Current Tag and Hash
+        id: get_tag
+        run: |
+          echo ::set-output name=tag::$(git describe --tags --abbrev=0)
+          echo ::set-output name=commit::$(git rev-list -n 1 ${{ steps.get_tag.outputs.tag }}
+
+      - name: print tag and hash
+        run: |
+          echo ${{ steps.get_tag.outputs.tag }}
+          echo ${{ steps.get_tag.outputs.commit }}
+          
+
+      # tag format: pyinfra-ecs|worker-{timestamp}-{username}
+      - name: Split tag
+        id: split_tag
+        run: |
+          echo ::set-output name=username::$(echo ${{ steps.get_tag.outputs.tag }} | cut -d'-' -f4)
+          echo ::set-output name=tag::$(echo ${{ steps.get_tag.outputs.tag }} | cut -d'-' -f1-3)
+
+      # get changelog from previous tag to current tag
+      - name: Get Changelog
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          custom_tag: ${{ steps.split_tag.outputs.tag }}
+          tag_prefix: ''
+
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.split_tag.outputs.tag }}
+          name: Release ${{ steps.split_tag.outputs.tag }}
+          body: >
+            ${{ steps.tag_version.outputs.changelog }}
+            deploy by @${{ steps.split_tag.outputs.username }}
