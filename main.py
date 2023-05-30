@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 def main():
-    sh(f'git tag production-ecs-{datetime.now().strftime("%Y%m%d%H%M%S")}-hslim8888 && git push --tags')
+    sh(f'git tag trigger-ecs-{datetime.now().strftime("%Y%m%d%H%M%S")}-hslim8888 && git push --tags')
 
 
 if __name__ == '__main__':

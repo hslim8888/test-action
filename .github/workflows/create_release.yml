@@ -2,7 +2,7 @@ name: Create Release
 on:
   push:
     tags:
-      - 'production*'
+      - 'trigger*'
 
 jobs:
   release:
@@ -15,7 +15,7 @@ jobs:
       - name: Get triggered tag and hash
         id: get_tag
         run: |
-          echo ::set-output name=tag::$(git describe --tags --abbrev=0)
+          echo ::set-output name=tag::$(git describe --tags --abbrev=0 | grep trigger)
           echo ::set-output name=commit::$(git rev-list -n 1 ${{ steps.get_tag.outputs.tag }})
 
       - name: print tag and hash
@@ -23,10 +23,13 @@ jobs:
           echo ${{ steps.get_tag.outputs.tag }}
           echo ${{ steps.get_tag.outputs.commit }}
 
-      - name: Get latest released tag and hash
+      - name: Get latest released tag
         id: get_latest_tag
         run: |
-          echo ::set-output name=released-tag::$(git tag --sort=-creatordate --merged main | grep released | sed -n 1p)
+          echo ::set-output name=released-tag::$(git tag --sort=-creatordate --merged main | grep -v trigger | sed -n 1p)
+      - name: Get hash of latest released tag
+        if: ${{ steps.get_latest_tag.outputs.released-tag != '' }}
+        run: |
           echo ::set-output name=released-commit::$(git rev-list -n 1 ${{ steps.get_latest_tag.outputs.released-tag }})
 
       - name: print latest released tag and hash
@@ -35,19 +38,19 @@ jobs:
           echo ${{ steps.get_latest_tag.outputs.released-tag }}
           echo ${{ steps.get_latest_tag.outputs.released-commit }} 
       
-      
-      
-      
-          
-
-      # tag format: pyinfra-ecs|worker-{timestamp}-{username}
+      # tag format: trigger-ecs|worker-{timestamp}-{username}
       - name: New released Tag
         id: new_tag
         run: |
           echo ::set-output name=username::$(echo ${{ steps.get_tag.outputs.tag }} | cut -d'-' -f4)
-          echo ::set-output name=tag::$(echo ${{ steps.get_latest_tag.outputs.tag }} | cut -d'-' -f1-3 | sed 's/$/-released/')
+          echo ::set-output name=tag::$(echo ${{ steps.get_latest_tag.outputs.tag }} | cut -d'-' -f2-3)
+      - name: print new tag
+        run: |
+          echo ${{ steps.new_tag.outputs.tag }}
+          echo ${{ steps.new_tag.outputs.username }}
 
       - name: Get commit lists between latest released tag and new tag
+        if: ${{ steps.get_latest_tag.outputs.released-tag != '' }}
         id: get_commit_lists
         run: |
           echo ::set-output name=commit-lists::$(git log --pretty=format:"%s @%an - [%h](https://github.com/hslim8888/test-action/commit/%h)" ${{ steps.get_latest_tag.outputs.released-commit }}..${{ steps.get_tag.outputs.commit }})
@@ -68,5 +71,5 @@ jobs:
           name: Release ${{ steps.split_tag.outputs.tag }}
           body: >
             [compare link](https://github.com/hslim8888/test-action/compare/${{ steps.get_latest_tag.outputs.released-tag }}...${{ steps.new_tag.outputs.tag }})) 
-            ${{ steps.get_commit_lists.outputs.commit-lists }}
+            ${{ steps.get_commit_lists.outputs.commit-lists | ''}}
             deploy by @${{ steps.new_tag.outputs.username }}
