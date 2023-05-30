@@ -34,8 +34,8 @@ jobs:
 
       - name: print latest released tag and hash
         run: |
-          echo $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
-          git tag --sort=-creatordate | grep -v trigger | sed -n 1p
+          echo $(git tag --sort=-creatordate)
+          git tag --sort=-creatordate 
           echo ${{ steps.get_latest_tag.outputs.released-tag }}
           echo ${{ steps.get_latest_tag.outputs.released-commit }} 
       
