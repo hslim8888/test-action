@@ -1,15 +1,13 @@
 name: Create Release
 on:
   push:
-    branches:
-      - main
+#    branches:
+#      - main
     tags:
       - 'trigger*'
-
-
 jobs:
   release:
-    if: ${{ github.ref == 'refs/heads/main' }}
+#    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -39,6 +37,8 @@ jobs:
         run: |
           git branch --show-current
           echo ${{ github.ref }}
+          echo ${{ github.ref_name }}
+
           echo ${{ github.head_ref }}
           echo ${{ github.base_ref }}
 
