@@ -55,15 +55,6 @@ jobs:
         run: |
           echo ::set-output name=commit-lists::$(git log --pretty=format:"%s @%an - [%h](https://github.com/hslim8888/test-action/commit/%h)" ${{ steps.get_latest_tag.outputs.released-commit }}..${{ steps.get_tag.outputs.commit }})
 
-      # get changelog from previous tag to current tag
-#      - name: Get Changelog
-#        id: tag_version
-#        uses: mathieudutour/github-tag-action@v6.1
-#        with:
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
-#          custom_tag: ${{ steps.split_tag.outputs.tag }}
-#          tag_prefix: ''
-
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
