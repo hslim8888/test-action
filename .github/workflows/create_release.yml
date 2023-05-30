@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
-        with:
-          ref: main
 
       - name: Get triggered tag and hash
         id: get_tag
