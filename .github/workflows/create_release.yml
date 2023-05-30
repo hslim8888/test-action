@@ -32,9 +32,13 @@ jobs:
         run: |
           echo ::set-output name=released-commit::$(git rev-list -n 1 ${{ steps.get_latest_tag.outputs.released-tag }})
 
+      - name: print current branch
+        run: |
+          echo ${{ github.ref }}
+
       - name: print latest released tag and hash
         run: |
-          git tag --sort=-creatordate --merged main
+          git tag --sort=-creatordate 
 
 #      # tag format: trigger-ecs|worker-{timestamp}-{username}
 #      - name: New released Tag
