@@ -6,7 +6,7 @@ on:
 
 jobs:
   release:
-#    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -33,7 +33,6 @@ jobs:
           echo ::set-output name=released-commit::$(git rev-list -n 1 ${{ steps.get_latest_tag.outputs.released-tag }})
 
       - name: print latest released tag and hash
-        if: ${{ steps.get_latest_tag.outputs.released-tag != '' }}
         run: |
           echo ${{ steps.get_latest_tag.outputs.released-tag }}
           echo ${{ steps.get_latest_tag.outputs.released-commit }} 
