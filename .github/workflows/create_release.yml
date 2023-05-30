@@ -34,7 +34,9 @@ jobs:
 
       - name: print current branch
         run: |
-          echo ${{ github.ref }}
+          git branch --show-current
+          echo ${{ github.head_ref }}
+          echo ${{ github.base_ref }}
 
       - name: print latest released tag and hash
         run: |
