@@ -14,9 +14,6 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: ${{ github.ref }}
 
       - name: Get triggered tag
         id: trigger_tag
@@ -27,7 +24,7 @@ jobs:
         id: trigger_tag_info
         run: |
           echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
-          echo ::set-output name=branch::$(git branch --contains ${{ steps.trigger_tag.outputs.tag }})
+          echo ::set-output name=branch::$(git checkout main && git branch --contains ${{ steps.trigger_tag.outputs.tag }})
 
       - name: print the results
         run: |
