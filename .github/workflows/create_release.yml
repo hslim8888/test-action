@@ -27,6 +27,7 @@ jobs:
         id: trigger_tag
         run: |
           echo ::set-output name=tag::$(git describe --tags --abbrev=0 | grep trigger)
+
       - name: Set new info
         id: new
         run: |
