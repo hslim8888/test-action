@@ -14,9 +14,13 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: git status
-        run: git status
+        run: |
+          git status
+          git log
 
 #      # tag format: trigger-ecs|worker-{timestamp}-{username}
 #      - name: Get triggered tag
