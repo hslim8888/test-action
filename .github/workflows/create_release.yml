@@ -15,6 +15,14 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
+      - name: checkout head
+        run: |
+          git checkout HEAD^
+
+      - name: print
+        run: |
+          git tags
+
       - name: Get triggered tag
         id: trigger_tag
         run: |
