@@ -30,30 +30,30 @@ jobs:
       - name: Set new info
         id: new
         run: |
-          echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
+#          echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
           echo ::set-output name=username::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f4)
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-3)
 
       - name: print tag and hash
         run: |
           echo ${{ steps.trigger_tag.outputs.tag }}
-          echo ${{ steps.trigger_tag.outputs.commit }}
+#          echo ${{ steps.trigger_tag.outputs.commit }}
 
       - name: Get latest release
         id: latest_release
         run: |
-          echo ::set-output name=commit::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
-          echo ::set-output name=tag::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
+#          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
 
       - name: print the result
         run: |
-          echo ${{ steps.latest_release.outputs.commit }}
+#          echo ${{ steps.latest_release.outputs.commit }}
           echo ${{ steps.latest_release.outputs.tag }}
 
       - name: Get changelog
         id: changelog
         run: |
-          git log --pretty=format:"%h - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }}
+          git log --pretty=format:"%h - %s : @%an" ${{ steps.latest_release.outputs.tag }}..${{ steps.new.outputs.tag }}
 #            echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
 
 #      - name: Create a release
