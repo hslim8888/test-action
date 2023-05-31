@@ -20,11 +20,13 @@ jobs:
         run: |
           echo ::set-output name=tag::$(git describe --tags --abbrev=0 | grep trigger)
           echo ::set-output name=commit::$(git rev-list -n 1 ${{ steps.get_tag.outputs.tag }})
-          echo ::set-output name=branch::$(git branch --contains ${{ steps.get_tag.outputs.commit }})
+#          echo ::set-output name=branch::$(git branch --contains ${{ steps.get_tag.outputs.commit }})
 
-      - name: check if branch is main
+      - name: print the results
         run: |
-          echo ${{ steps.get_tag.outputs.branch }}
+          echo ${{ steps.get_tag.outputs.tag }}
+          echo ${{ steps.get_tag.outputs.commit }}
+#          echo ${{ steps.get_tag.outputs.branch }}
 
 #      - name: print tag and hash
 #        run: |
