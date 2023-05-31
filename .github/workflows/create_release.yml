@@ -54,7 +54,7 @@ jobs:
       - name: Get changelog
         id: changelog
         run: |
-          echo ::set-output name=changelog::$(git log --pretty=format:"%h - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
+          git log --pretty=format:"%h - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }}
 #            echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
 
 #      - name: Create a release
