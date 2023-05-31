@@ -17,11 +17,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: git status
-        run: |
-          git status
-          git log
-
       # tag format: trigger-ecs|worker-{timestamp}-{username}
       - name: Get triggered tag
         id: trigger_tag
@@ -39,21 +34,11 @@ jobs:
         run: |
           echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
 
-      - name: print
+      - name: Get changelog
+        id: changelog
         run: |
-          echo ${{ steps.latest_release.outputs.tag }}
-          echo ${{ steps.new.outputs.tag }}
+          git log --pretty=format:"%h - %s : @%an" ${{ steps.latest_release.outputs.tag }}..${{ steps.new.outputs.tag }}
 
-#      - name: print the result
-#        run: |
-##          echo ${{ steps.latest_release.outputs.commit }}
-#          echo ${{ steps.latest_release.outputs.tag }}
-#
-#      - name: Get changelog
-#        id: changelog
-#        run: |
-#          git log --pretty=format:"%h - %s : @%an" ${{ steps.latest_release.outputs.tag }}..${{ steps.new.outputs.tag }}
-#
 ##            echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
 #
 ##      - name: Create a release
