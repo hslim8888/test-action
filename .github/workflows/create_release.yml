@@ -42,8 +42,8 @@ jobs:
       - name: Get latest release
         id: latest_release
         run: |
-          echo ::set-output name=commit::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
-          echo ::set-output name=tag::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
+          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
 
       - name: print the result
         run: |
