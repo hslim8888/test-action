@@ -24,7 +24,7 @@ jobs:
         id: trigger_tag_info
         run: |
           echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
-          echo ::set-output name=branch::$(git checkout main && git branch --contains ${{ steps.trigger_tag.outputs.tag }})
+          echo ::set-output name=branch::$(git branch --contains ${{ steps.trigger_tag.outputs.commit }} --format='%(refname:short)')
 
       - name: print the results
         run: |
