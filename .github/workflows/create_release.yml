@@ -3,7 +3,7 @@ on:
   push:
     # 여기에 branches를 넣으면 or 조건으로 동작함
     # tags 로만 트리거 되는 동작은 github.ref 가 refs/tags/{tag-name} 이고,
-    # checkout 을 하면 detached HEAD 상태로 동작함
+    # checkout 을 하면 detached HEAD 상태로 동작함 > 브랜치 정보를 구할 수 없음.
     tags:
       - 'trigger*'
 
@@ -19,24 +19,19 @@ jobs:
         id: trigger_tag
         run: |
           echo ::set-output name=tag::$(git describe --tags --abbrev=0 | grep trigger)
-
-      - name: Get commit and branch of triggered tag
-        id: trigger_tag_info
-        run: |
           echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
-          echo ::set-output name=branch::$(git branch --contains ${{ steps.trigger_tag.outputs.commit }} --format='%(refname:short)')
 
-      - name: print the results
+      - name: print tag and hash
         run: |
-          echo ${{ steps.trigger_tag.outputs.tag }}
-          echo ${{ steps.trigger_tag_info.outputs.commit }}
-          echo ${{ steps.trigger_tag_info.outputs.branch }}
+          echo ${{ steps.get_tag.outputs.tag }}
+          echo ${{ steps.get_tag.outputs.commit }}
 
-#      - name: print tag and hash
-#        run: |
-#          echo ${{ steps.get_tag.outputs.tag }}
-#          echo ${{ steps.get_tag.outputs.commit }}
-#
+      - name: check main and tag list
+        run: |
+          git checkout main
+          git tag --sort=-creatordate
+      
+
 #      - name: Get latest released tag
 #        id: get_latest_tag
 #        run: |
