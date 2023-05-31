@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
+        with:
+          path: main
 
       # tag format: trigger-ecs|worker-{timestamp}-{username}
       - name: Get triggered tag
@@ -48,7 +50,7 @@ jobs:
         id: changelog
         # 커밋 메세지 - 해시[링크] - 커밋한 사람
         run: |
-          echo ::set-output name=changelog::$(git checkout main && git log --pretty=format:"%h - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
+          echo ::set-output name=changelog::$(git log --pretty=format:"%h - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
 #            echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
       
 #      - name: Create a release
