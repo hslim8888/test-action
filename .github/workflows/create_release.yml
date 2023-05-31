@@ -29,22 +29,23 @@ jobs:
           echo ${{ steps.get_tag.outputs.tag }}
           echo ${{ steps.get_tag.outputs.commit }}
 
-      - name: delete trigger tag
-        run: |
-          git push origin --delete ${{ steps.trigger_tag.outputs.tag }}
+#      - name: delete trigger tag
+#        run: |
+#          git push origin --delete ${{ steps.trigger_tag.outputs.tag }}
 
       - name: Get latest release
         id: get_latest_release
         run: |
-          echo ::set-output name=latest_release::$(git ls-remote --sort=-creatordate --tags | grep -v trigger | sed -n 1p)
-          echo ::set-output name=latest_release_tag::$(echo ${{ steps.get_latest_release.outputs.latest_release }} | cut -f2 | cut -d'/' -f3)
-          echo ::set-output name=latest_release_commit::$(echo ${{ steps.get_latest_release.outputs.latest_release }} | cut -f1)
+          git ls-remote --tags
+#          echo ::set-output name=latest_release::$(git ls-remote --sort=-creatordate --tags | grep -v trigger | sed -n 1p)
+#          echo ::set-output name=latest_release_tag::$(echo ${{ steps.get_latest_release.outputs.latest_release }} | cut -f2 | cut -d'/' -f3)
+#          echo ::set-output name=latest_release_commit::$(echo ${{ steps.get_latest_release.outputs.latest_release }} | cut -f1)
 
-      - name: print the result
-        run: |
-          echo ${{ steps.get_latest_release.outputs.latest_release }}
-          echo ${{ steps.get_latest_release.outputs.latest_release_tag }}
-          echo ${{ steps.get_latest_release.outputs.latest_release_commit }}
+#      - name: print the result
+#        run: |
+#          echo ${{ steps.get_latest_release.outputs.latest_release }}
+#          echo ${{ steps.get_latest_release.outputs.latest_release_tag }}
+#          echo ${{ steps.get_latest_release.outputs.latest_release_commit }}
       
 
 #      - name: Get latest released tag
