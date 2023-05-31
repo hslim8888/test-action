@@ -42,7 +42,7 @@ jobs:
         id: released
         run: |
           echo ::set-output name=tag::$(echo ${{ steps.latest_release.outputs.latest_release }} | cut -f2 | cut -d'/' -f3)
-          echo ::set-output name=commit::$(echo ${{ steps.latest_release.outputs.latest_release }} | cut -f1)
+          echo ::set-output name=commit::$(echo git rev-list -n 1 ${{ steps.released.outputs.tag }})
 
       - name: print the result
         run: |
