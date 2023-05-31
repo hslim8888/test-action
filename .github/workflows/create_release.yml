@@ -30,7 +30,7 @@ jobs:
       - name: Set new info
         id: new
         run: |
-          echo ::set-output name=commit::$(git rev-parse ${{ steps.trigger_tag.outputs.tag }})
+          echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
           echo ::set-output name=username::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f4)
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-3)
 
@@ -39,12 +39,11 @@ jobs:
           echo ${{ steps.trigger_tag.outputs.tag }}
           echo ${{ steps.trigger_tag.outputs.commit }}
 
-      # git --sort 옵션이 안 됨.
       - name: Get latest release
         id: latest_release
         run: |
           echo ::set-output name=commit::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
-          echo ::set-output name=tag::$(git rev-parse $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+          echo ::set-output name=tag::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
 
       - name: print the result
         run: |
