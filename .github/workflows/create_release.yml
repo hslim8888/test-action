@@ -48,7 +48,7 @@ jobs:
         id: changelog
         # 커밋 메세지 - 해시[링크] - 커밋한 사람
         run: |
-            echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/commit/%h) - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
+            echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
       
       - name: Create a release
         uses: ncipollo/release-action@v1
@@ -57,7 +57,7 @@ jobs:
           name: Release ${{ steps.new.outputs.tag }}
           makeLatest: true
           body: >
-            [Compare link](https://github.com/hslim8888/compare/${{ steps.latest_release.outputs.tag }}...${{ steps.new.outputs.tag }})
+            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_release.outputs.tag }}...${{ steps.new.outputs.tag }})
             ${{ steps.changelog.outputs.changelog }}
             deploy by @${{ steps.new.outputs.username }}
 
