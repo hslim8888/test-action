@@ -15,29 +15,36 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: checkout head
-        run: |
-          git checkout HEAD^
-
-      - name: print
-        run: |
-          git tags
-
+      # tag format: trigger-ecs|worker-{timestamp}-{username}
       - name: Get triggered tag
         id: trigger_tag
         run: |
           echo ::set-output name=tag::$(git describe --tags --abbrev=0 | grep trigger)
           echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
+          echo ::set-output name=username::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f4)
+          echo ::set-output name=new_tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-3)
 
       - name: print tag and hash
         run: |
           echo ${{ steps.get_tag.outputs.tag }}
           echo ${{ steps.get_tag.outputs.commit }}
 
-      - name: check main and tag list
+      - name: delete trigger tag
         run: |
-          git checkout main
-          git tag --sort=-creatordate
+          git push origin --delete ${{ steps.trigger_tag.outputs.tag }}
+
+      - name: Get latest release
+        id: get_latest_release
+        run: |
+          echo ::set-output name=latest_release::$(git ls-remote --sort=-creatordate --tags | grep -v trigger | sed -n 1p)
+          echo ::set-output name=latest_release_tag::$(echo ${{ steps.get_latest_release.outputs.latest_release }} | cut -f2 | cut -d'/' -f3)
+          echo ::set-output name=latest_release_commit::$(echo ${{ steps.get_latest_release.outputs.latest_release }} | cut -f1)
+
+      - name: print the result
+        run: |
+          echo ${{ steps.get_latest_release.outputs.latest_release }}
+          echo ${{ steps.get_latest_release.outputs.latest_release_tag }}
+          echo ${{ steps.get_latest_release.outputs.latest_release_commit }}
       
 
 #      - name: Get latest released tag
