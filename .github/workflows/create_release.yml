@@ -26,8 +26,8 @@ jobs:
 
       - name: print tag and hash
         run: |
-          echo ${{ steps.get_tag.outputs.tag }}
-          echo ${{ steps.get_tag.outputs.commit }}
+          echo ${{ steps.trigger_tag.outputs.tag }}
+          echo ${{ steps.trigger_tag.outputs.commit }}
 
 #      - name: delete trigger tag
 #        run: |
@@ -36,7 +36,7 @@ jobs:
       - name: Get latest release
         id: get_latest_release
         run: |
-          git ls-remote --tags
+          git ls-remote --tags --sort=-creatordate | grep -v trigger
 #          echo ::set-output name=latest_release::$(git ls-remote --sort=-creatordate --tags | grep -v trigger | sed -n 1p)
 #          echo ::set-output name=latest_release_tag::$(echo ${{ steps.get_latest_release.outputs.latest_release }} | cut -f2 | cut -d'/' -f3)
 #          echo ::set-output name=latest_release_commit::$(echo ${{ steps.get_latest_release.outputs.latest_release }} | cut -f1)
