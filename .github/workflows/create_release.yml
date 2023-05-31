@@ -43,7 +43,7 @@ jobs:
       - name: Get changelog
         id: changelog
         run: |
-          echo ::set-output name=changelog::$(git log --pretty=format:"<br/>[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b> : @%an </br>" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
+          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b> : @%an </br>" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
 
       - name: Create a release
         uses: ncipollo/release-action@v1
