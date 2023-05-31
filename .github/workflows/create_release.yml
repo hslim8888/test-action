@@ -1,10 +1,12 @@
 name: Create Release
 on:
   push:
-#    branches:
-#      - main
+    # 여기에 branches를 넣으면 or 조건으로 동작함
+    # tags 로만 트리거 되는 동작은 github.ref 가 refs/tags/{tag-name} 이고,
+    # checkout 을 하면 detached HEAD 상태로 동작함
     tags:
       - 'trigger*'
+
 jobs:
   release:
 #    if: ${{ github.ref == 'refs/heads/main' }}
@@ -13,47 +15,52 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Get triggered tag and hash
+      - name: Get triggered tag, commit and branch
         id: get_tag
         run: |
           echo ::set-output name=tag::$(git describe --tags --abbrev=0 | grep trigger)
           echo ::set-output name=commit::$(git rev-list -n 1 ${{ steps.get_tag.outputs.tag }})
+          echo ::set-output name=branch::$(git branch --contains ${{ steps.get_tag.outputs.commit }} | sed -n 1p)
 
-      - name: print tag and hash
+      - name: check if branch is main
         run: |
-          echo ${{ steps.get_tag.outputs.tag }}
-          echo ${{ steps.get_tag.outputs.commit }}
+          echo ${{ steps.get_tag.outputs.branch == 'main' }}
 
-      - name: Get latest released tag
-        id: get_latest_tag
-        run: |
-          echo ::set-output name=released-tag::$(git tag --sort=-creatordate --merged main | grep -v trigger | sed -n 1p)
-      - name: Get hash of latest released tag
-        if: ${{ steps.get_latest_tag.outputs.released-tag != '' }}
-        run: |
-          echo ::set-output name=released-commit::$(git rev-list -n 1 ${{ steps.get_latest_tag.outputs.released-tag }})
-
-      - name: print tag
-        run: |
-          git ls-remote --tags | grep -v trigger
-
-      - name: print current branch
-        run: |
-          git branch --show-current
-          echo ${{ github.ref }}
-          echo ${{ github.ref_name }}
-
-          echo ${{ github.head_ref }}
-          echo ${{ github.base_ref }}
-
-      - name: print latest released tag and hash
-        run: |
-          git tag --sort=-creatordate 
-
-#      - name: Get Changelog
-#        id: tag_version
-#        uses: mathieudutour/github-tag-action@v6.1
-#        with:
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
-#          custom_tag: ${{ steps.split_tag.outputs.tag }}
-#          tag_prefix: ''
+#      - name: print tag and hash
+#        run: |
+#          echo ${{ steps.get_tag.outputs.tag }}
+#          echo ${{ steps.get_tag.outputs.commit }}
+#
+#      - name: Get latest released tag
+#        id: get_latest_tag
+#        run: |
+#          echo ::set-output name=released-tag::$(git tag --sort=-creatordate --merged main | grep -v trigger | sed -n 1p)
+#      - name: Get hash of latest released tag
+#        if: ${{ steps.get_latest_tag.outputs.released-tag != '' }}
+#        run: |
+#          echo ::set-output name=released-commit::$(git rev-list -n 1 ${{ steps.get_latest_tag.outputs.released-tag }})
+#
+#      - name: print tag
+#        run: |
+#          git ls-remote --tags | grep -v trigger
+#
+#      - name: print current branch
+#        run: |
+#          git branch --show-current
+#          echo ${{ github.ref }}
+#          echo ${{ github.ref_name }}
+#
+#          echo ${{ github.head_ref }}
+#          echo ${{ github.base_ref }}
+#
+#      - name: print latest released tag and hash
+#        run: |
+#          git tag --sort=-creatordate
+#
+##      - name: Get Changelog
+##        id: tag_version
+##        uses: mathieudutour/github-tag-action@v6.1
+##        with:
+##          github_token: ${{ secrets.GITHUB_TOKEN }}
+##          custom_tag: ${{ steps.split_tag.outputs.tag }}
+##          tag_prefix: ''
