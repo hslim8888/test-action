@@ -33,10 +33,12 @@ jobs:
 #        run: |
 #          git push origin --delete ${{ steps.trigger_tag.outputs.tag }}
 
+      # --sort 옵션이 안 됨.
       - name: Get latest release
         id: get_latest_release
         run: |
-          git ls-remote --tags --sort=-creatordate
+          git ls-remote --tags | grep -v trigger | sort -k2 -r
+
 #          echo ::set-output name=latest_release::$(git ls-remote --sort=-creatordate --tags | grep -v trigger | sed -n 1p)
 #          echo ::set-output name=latest_release_tag::$(echo ${{ steps.get_latest_release.outputs.latest_release }} | cut -f2 | cut -d'/' -f3)
 #          echo ::set-output name=latest_release_commit::$(echo ${{ steps.get_latest_release.outputs.latest_release }} | cut -f1)
