@@ -37,18 +37,13 @@ jobs:
       - name: Get latest release
         id: latest_release
         run: |
-          echo ::set-output name=latest_release::$(git ls-remote --tags | grep -v trigger | sort -k2 -r | sed -n 1p)
           echo ::set-output name=commit::$(git ls-remote --tags | grep -v trigger | sort -k2 -r | sed -n 1p | cut -f1)
-      - name: released tag
-        id: released_tag
-        run: |
-          echo ::set-output name=tag::$(echo ${{ steps.latest_release.outputs.latest_release }} | cut -f2 | cut -d'/' -f3)
+          echo ::set-output name=tag::$(git ls-remote --tags | grep -v trigger | sort -k2 -r | sed -n 1p | cut -f2 | cut -d'/' -f3)
 
       - name: print the result
         run: |
-          echo ${{ steps.latest_release.outputs.latest_release }}
-          echo ${{ steps.released_tag.outputs.tag }}
           echo ${{ steps.latest_release.outputs.commit }}
+          echo ${{ steps.latest_release.outputs.tag }}
       
 
 #      - name: Get latest released tag
