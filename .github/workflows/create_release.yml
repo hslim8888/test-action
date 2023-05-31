@@ -30,7 +30,7 @@ jobs:
       - name: Set new info
         id: new
         run: |
-          echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
+          echo ::set-output name=commit::$(git rev-parse ${{ steps.trigger_tag.outputs.tag }})
           echo ::set-output name=username::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f4)
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-3)
 
@@ -43,29 +43,28 @@ jobs:
       - name: Get latest release
         id: latest_release
         run: |
-          git tag --sort=-creatordate
-#          echo ::set-output name=commit::$(git ls-remote --tags | grep -v trigger | sort -k2 -r | sed -n 1p | cut -f1)
-#          echo ::set-output name=tag::$(git ls-remote --tags | grep -v trigger | sort -k2 -r | sed -n 1p | cut -f2 | cut -d'/' -f3)
+          echo ::set-output name=commit::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
+          echo ::set-output name=tag::$(git rev-parse $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
 
-#      - name: print the result
-#        run: |
-#          echo ${{ steps.latest_release.outputs.commit }}
-#          echo ${{ steps.latest_release.outputs.tag }}
-#
-#      - name: Get changelog
-#        id: changelog
-#        run: |
-#          git log --pretty=format:"%h - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }}
-##            echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
-#
-##      - name: Create a release
-##        uses: ncipollo/release-action@v1
-##        with:
-##          tag: ${{ steps.new.outputs.tag }}
-##          name: Release ${{ steps.new.outputs.tag }}
-##          makeLatest: true
-##          body: >
-##            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_release.outputs.tag }}...${{ steps.new.outputs.tag }})
-##            ${{ steps.changelog.outputs.changelog }}
-##            deploy by @${{ steps.new.outputs.username }}
-#
+      - name: print the result
+        run: |
+          echo ${{ steps.latest_release.outputs.commit }}
+          echo ${{ steps.latest_release.outputs.tag }}
+
+      - name: Get changelog
+        id: changelog
+        run: |
+          git log --pretty=format:"%h - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }}
+#            echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
+
+#      - name: Create a release
+#        uses: ncipollo/release-action@v1
+#        with:
+#          tag: ${{ steps.new.outputs.tag }}
+#          name: Release ${{ steps.new.outputs.tag }}
+#          makeLatest: true
+#          body: >
+#            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_release.outputs.tag }}...${{ steps.new.outputs.tag }})
+#            ${{ steps.changelog.outputs.changelog }}
+#            deploy by @${{ steps.new.outputs.username }}
+
