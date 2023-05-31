@@ -20,9 +20,12 @@ jobs:
         id: trigger_tag
         run: |
           echo ::set-output name=tag::$(git describe --tags --abbrev=0 | grep trigger)
+      - name: Set new info
+        id: new
+        run: |
           echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
           echo ::set-output name=username::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f4)
-          echo ::set-output name=new_tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-3)
+          echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-3)
 
       - name: print tag and hash
         run: |
@@ -45,15 +48,16 @@ jobs:
         id: changelog
         # 커밋 메세지 - 해시[링크] - 커밋한 사람
         run: |
-            echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/commit/%h) - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.trigger_tag.outputs.commit }})
+            echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/commit/%h) - %s : @%an" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
       
       - name: Create a release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.trigger_tag.outputs.new_tag }}
-          name: Release ${{ steps.trigger_tag.outputs.new_tag }}
+          tag: ${{ steps.new.outputs.tag }}
+          name: Release ${{ steps.new.outputs.tag }}
+          makeLatest: true
           body: >
-            [Compare link](https://github.com/hslim8888/compare/${{ steps.latest_release.outputs.tag }}...${{ steps.trigger_tag.outputs.tag }})
+            [Compare link](https://github.com/hslim8888/compare/${{ steps.latest_release.outputs.tag }}...${{ steps.new.outputs.tag }})
             ${{ steps.changelog.outputs.changelog }}
-            deploy by @${{ steps.trigger_tag.outputs.username }}
+            deploy by @${{ steps.new.outputs.username }}
 
