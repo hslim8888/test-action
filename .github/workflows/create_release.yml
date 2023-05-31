@@ -57,4 +57,3 @@ jobs:
             ${{ steps.changelog.outputs.changelog }}
             <br/>
             deploy by @${{ steps.new.outputs.username }}
-            
