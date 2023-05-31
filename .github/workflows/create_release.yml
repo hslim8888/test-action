@@ -14,6 +14,9 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.ref }}
 
       - name: Get triggered tag
         id: trigger_tag
