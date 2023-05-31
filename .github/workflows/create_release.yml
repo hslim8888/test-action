@@ -19,8 +19,8 @@ jobs:
         id: get_tag
         run: |
           echo ::set-output name=tag::$(git describe --tags --abbrev=0 | grep trigger)
-          echo ::set-output name=commit::$(git rev-list -n 1 ${{ steps.get_tag.outputs.tag }})
-          echo ::set-output name=branch::$(git branch --contains ${{ steps.get_tag.outputs.commit }})
+          echo ::set-output name=commit::$(git show-ref -s ${{ steps.get_tag.outputs.tag }})
+          echo ::set-output name=branch::$(git branch --contains ${{ steps.get_tag.outputs.tag }})
 
       - name: print the results
         run: |
