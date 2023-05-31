@@ -15,18 +15,22 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Get triggered tag, commit and branch
-        id: get_tag
+      - name: Get triggered tag
+        id: trigger_tag
         run: |
           echo ::set-output name=tag::$(git describe --tags --abbrev=0 | grep trigger)
-          echo ::set-output name=commit::$(git show-ref -s ${{ steps.get_tag.outputs.tag }})
-          echo ::set-output name=branch::$(git branch --contains ${{ steps.get_tag.outputs.tag }})
+
+      - name: Get commit and branch of triggered tag
+        id: trigger_tag_info
+        run: |
+          echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
+          echo ::set-output name=branch::$(git branch --contains ${{ steps.trigger_tag.outputs.tag }})
 
       - name: print the results
         run: |
-          echo ${{ steps.get_tag.outputs.tag }}
-          echo ${{ steps.get_tag.outputs.commit }}
-          echo ${{ steps.get_tag.outputs.branch }}
+          echo ${{ steps.trigger_tag.outputs.tag }}
+          echo ${{ steps.trigger_tag_info.outputs.commit }}
+          echo ${{ steps.trigger_tag_info.outputs.branch }}
 
 #      - name: print tag and hash
 #        run: |
