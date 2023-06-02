@@ -3,7 +3,8 @@ from datetime import datetime
 
 
 def main():
-    sh(f"git fetch && git tag trigger-v{datetime.now().strftime('%Y-%m-%d-%H%M%S')}-mattlim origin/main && git push origin --tags")
+    tag = f"trigger-v{datetime.now().strftime('%Y-%m-%d-%H%M%S')}-mattlim"
+    sh(f"git fetch && git tag {tag} origin/main && git push origin {tag}")
     # sh(f"git tag trigger-v{datetime.now().strftime('%Y-%m-%d-%H%M')}-hslim8888 && git push --tags")
 
 
