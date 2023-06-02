@@ -18,6 +18,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: git status
+        run: git status
+
       - name: get current branch
         id: get_branch
         run: git branch --show-current
