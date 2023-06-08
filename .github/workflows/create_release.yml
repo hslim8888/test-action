@@ -58,6 +58,7 @@ jobs:
           tag: ${{ steps.new.outputs.tag }}
           name: Release ${{ steps.new.outputs.tag }}
           makeLatest: true
+          generateReleaseNotes: false
           body: >
             [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_release.outputs.tag }}...${{ steps.new.outputs.tag }})
             <br/>
