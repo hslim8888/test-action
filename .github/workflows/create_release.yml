@@ -56,7 +56,7 @@ jobs:
           tag: ${{ steps.new.outputs.tag }}
           name: Release ${{ steps.new.outputs.tag }}
           makeLatest: true
-          generateReleaseNotes: false
+          generateReleaseNotes: true
           body: >
             [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_release.outputs.tag }}...${{ steps.new.outputs.tag }})
             <br/>
