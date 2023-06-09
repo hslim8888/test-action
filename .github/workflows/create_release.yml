@@ -39,28 +39,31 @@ jobs:
           echo ::set-output name=username::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f6)
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
 
-      - name: Get latest release
-        id: latest_release
-        run: |
-          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
-          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+      - name: print github actor
+        run: echo ${{ github.actor }}
 
-      - name: Get changelog
-        id: changelog
-        run: |
-          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b> : </br>" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
-
-      - name: Create a release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.new.outputs.tag }}
-          name: Release ${{ steps.new.outputs.tag }}
-          makeLatest: true
-          generateReleaseNotes: true
-          body: >
-            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_release.outputs.tag }}...${{ steps.new.outputs.tag }})
-            <br/>
-            <br/>
-            ${{ steps.changelog.outputs.changelog }}
-            <br/>
-            deploy by @${{ steps.new.outputs.username }}
+#      - name: Get latest release
+#        id: latest_release
+#        run: |
+#          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
+#          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+#
+#      - name: Get changelog
+#        id: changelog
+#        run: |
+#          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b> : </br>" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
+#
+#      - name: Create a release
+#        uses: ncipollo/release-action@v1
+#        with:
+#          tag: ${{ steps.new.outputs.tag }}
+#          name: Release ${{ steps.new.outputs.tag }}
+#          makeLatest: true
+#          generateReleaseNotes: true
+#          body: >
+#            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_release.outputs.tag }}...${{ steps.new.outputs.tag }})
+#            <br/>
+#            <br/>
+#            ${{ steps.changelog.outputs.changelog }}
+#            <br/>
+#            deploy by @${{ steps.new.outputs.username }}
