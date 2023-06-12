@@ -32,7 +32,7 @@ jobs:
       - name: get message if tag is annotate tag
         id: annotate_tag
         run: |
-          echo ::set-output name=annotate::$(git tag -l -n99 --format='%(contents)' ${{ steps.trigger_tag.outputs.tag }} | grep -v trigger)
+          echo ::set-output name=annotate::$(git tag -l -n99 --format='%(contents)' ${{ steps.trigger_tag.outputs.tag }})
 
       - name: print annotate message
         run: |
