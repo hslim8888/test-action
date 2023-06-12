@@ -36,7 +36,7 @@ jobs:
       - name: get message if tag is annotate tag
         id: annotate_tag
         run: |
-          echo ::set-output name=annotate::$(git tag -l -n99 --format='%(contents)' ${{ steps.trigger_tag.outputs.tag }})
+          echo ::set-output name=annotate::$(git for-each-ref refs/tags/${{  steps.trigger_tag.outputs.tag  }} --format='%(contents)')
 
       - name: print annotate message
         run: |
