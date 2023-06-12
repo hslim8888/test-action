@@ -29,6 +29,10 @@ jobs:
           echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
 
+      - name: print git show tag
+        run: |
+          git show ${{ steps.trigger_tag.outputs.tag }}
+
       - name: get message if tag is annotate tag
         id: annotate_tag
         run: |
