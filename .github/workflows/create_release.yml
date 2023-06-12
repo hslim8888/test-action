@@ -29,47 +29,40 @@ jobs:
           echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
 
-      - name: Get tag annotation
-        id: tag-data
-        uses: ericcornelissen/git-tag-annotation-action@v2
-      - name: The output
-        run: echo ${{ steps.tag-data.outputs.git-tag-annotation }}
+      - name: print git show tag
+        run: |
+          git show ${{ steps.trigger_tag.outputs.tag }} --format='%(contents:subject)'
 
+      - name: get message if tag is annotate tag
+        id: annotate_tag
+        run: |
+          echo ::set-output name=annotate::$(git for-each-ref refs/tags/${{  steps.trigger_tag.outputs.tag  }} --format='%(contents)')
 
-#      - name: print git show tag
+      - name: print annotate message
+        run: |
+          echo ${{ steps.annotate_tag.outputs.annotate }}
+
+#      - name: Get latest deploy log
+#        id: latest_log
 #        run: |
-#          git show ${{ steps.trigger_tag.outputs.tag }}
+#          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
+#          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
 #
-#      - name: get message if tag is annotate tag
-#        id: annotate_tag
+#      - name: Get changelog
+#        id: changelog
 #        run: |
-#          echo ::set-output name=annotate::$(git for-each-ref refs/tags/${{  steps.trigger_tag.outputs.tag  }} --format='%(contents)')
+#          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b></br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
 #
-#      - name: print annotate message
-#        run: |
-#          echo ${{ steps.annotate_tag.outputs.annotate }}
-#
-##      - name: Get latest deploy log
-##        id: latest_log
-##        run: |
-##          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
-##          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
-##
-##      - name: Get changelog
-##        id: changelog
-##        run: |
-##          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b></br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
-##
-##      - name: Create a release
-##        uses: ncipollo/release-action@v1
-##        with:
-##          tag: ${{ steps.new.outputs.tag }}
-##          name: Release ${{ steps.new.outputs.tag }}
-##          makeLatest: true
-##          body: >
-##            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
-##            <br/>
-##            <br/>
-##            ${{ steps.changelog.outputs.changelog }}
-##            <br/>
-##            deployed by @${{ github.actor }}
+#      - name: Create a release
+#        uses: ncipollo/release-action@v1
+#        with:
+#          tag: ${{ steps.new.outputs.tag }}
+#          name: Release ${{ steps.new.outputs.tag }}
+#          makeLatest: true
+#          body: >
+#            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
+#            <br/>
+#            <br/>
+#            ${{ steps.changelog.outputs.changelog }}
+#            <br/>
+#            deployed by @${{ github.actor }}
