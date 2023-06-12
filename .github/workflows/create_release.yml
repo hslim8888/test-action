@@ -31,7 +31,7 @@ jobs:
 
       - name: print git show tag
         run: |
-          git show ${{ steps.trigger_tag.outputs.tag }}
+          git checkout main && git show ${{ steps.trigger_tag.outputs.tag }}
 
       - name: get message if tag is annotate tag
         id: annotate_tag
