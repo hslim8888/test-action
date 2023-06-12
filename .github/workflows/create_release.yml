@@ -1,16 +1,16 @@
-name: Create Release
+name: Deploy Log
 on:
   push:
     # 여기에 branches를 넣으면 or 조건으로 동작함
     # tags 로만 트리거 되는 동작은 github.ref 가 refs/tags/{tag-name} 이고,
     # checkout 을 하면 detached HEAD 상태로 동작
-        # fetch-depth: 0 을 꼭 넣어줘야 함. 아니면 해당 커밋만 가져옴.
+        # 또한, 태그 ref를 가져오기 위해 fetch-depth: 0 을 꼭 해줘야 함. 아니면 해당 커밋만 가져옴.
         # 브랜치 정보를 가져올 수 없어서 main 여부 체크를 할 수 없음.
     tags:
       - 'trigger*'
 
 jobs:
-  release:
+  deploy-log:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -18,14 +18,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: git status
-        run: git status
-
-      - name: get current branch
-        id: get_branch
-        run: git branch --show-current
-
-      # tag format: trigger-ecs|worker-{timestamp}-{username}
+      # tag format: trigger-v2023-06-01-0915
       - name: Get triggered tag
         id: trigger_tag
         run: |
@@ -34,35 +27,38 @@ jobs:
         id: new
         run: |
           echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
-          echo ::set-output name=username::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f6)
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
 
-      - name: Get latest release
-        id: latest_release
+      - name: get message if tag is annotate tag
+        id: annotate_tag
         run: |
-          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
-          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+          echo ::set-output name=annotate::$(git tag -l -n99 --format='%(contents)' ${{ steps.trigger_tag.outputs.tag }} | grep -v trigger)
 
-      - name: Get changelog
-        id: changelog
+      - name: print annotate message
         run: |
-          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/mediquitous-dev/zelda/commit/%h) - <b>%s</b> : @%an </br>" ${{ steps.latest_release.outputs.commit }}..${{ steps.new.outputs.commit }})
+          echo ${{ steps.annotate_tag.outputs.annotate }}
 
-      - name: delete trigger tag
-        run: |
-          git tag -d ${{ steps.trigger_tag.outputs.tag }}
-          git push origin :refs/tags/${{ steps.trigger_tag.outputs.tag }}
-
-      - name: Create a release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.new.outputs.tag }}
-          name: Release ${{ steps.new.outputs.tag }}
-          makeLatest: true
-          body: >
-            [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_release.outputs.tag }}...${{ steps.new.outputs.tag }})
-            <br/>
-            <br/>
-            ${{ steps.changelog.outputs.changelog }}
-            <br/>
-            deploy by @${{ steps.new.outputs.username }}
+#      - name: Get latest deploy log
+#        id: latest_log
+#        run: |
+#          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
+#          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+#
+#      - name: Get changelog
+#        id: changelog
+#        run: |
+#          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b></br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
+#
+#      - name: Create a release
+#        uses: ncipollo/release-action@v1
+#        with:
+#          tag: ${{ steps.new.outputs.tag }}
+#          name: Release ${{ steps.new.outputs.tag }}
+#          makeLatest: true
+#          body: >
+#            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
+#            <br/>
+#            <br/>
+#            ${{ steps.changelog.outputs.changelog }}
+#            <br/>
+#            deployed by @${{ github.actor }}
