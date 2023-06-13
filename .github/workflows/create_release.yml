@@ -64,6 +64,10 @@ jobs:
           git checkout main
           git status
 
+      - name: git show
+        run: |
+          git show
+
       - name: List merged PRs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
