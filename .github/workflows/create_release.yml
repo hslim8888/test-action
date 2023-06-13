@@ -56,8 +56,8 @@ jobs:
       - name: merged commit
         id: merged_commit
         run: |
-          echo ::set-output name=latest::$(echo ${{ steps.merged_pr.outputs.commit }} | head -n 1 | cut -d' ' -f1)
-          echo ::set-output name=oldest::$(echo ${{ steps.merged_pr.outputs.commit }} | tail -n 1 | cut -d' ' -f1)
+          echo ::set-output name=latest::$(echo '${{ steps.merged_pr.outputs.commit }}' | head -n 1 | cut -d' ' -f1)
+          echo ::set-output name=oldest::$(echo '${{ steps.merged_pr.outputs.commit }}' | tail -n 1 | cut -d' ' -f1)
 
       - name: List merged PRs
         env:
