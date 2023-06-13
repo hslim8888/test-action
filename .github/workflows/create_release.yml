@@ -90,11 +90,11 @@ jobs:
           body: >
             [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
             <br/>
-            ##PR LIST
+            <b>PR LIST</b>
             <br/>
             ${{ steps.pr_list.outputs.pr_list }}
             <br/>
-            ##CHANGELOG
+            <b>CHANGELOG</b>
             <br/>
             ${{ steps.changelog.outputs.changelog }}
             <br/>
