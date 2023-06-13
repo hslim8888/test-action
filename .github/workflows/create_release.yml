@@ -73,6 +73,11 @@ jobs:
         run: |
           git show
 
+      - name: using api
+        run: |
+          gh api -X GET /repos/hslim8888/test-action/pulls\?state=merged
+
+
       - name: List merged PRs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
