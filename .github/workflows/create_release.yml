@@ -18,6 +18,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install gh CLI
+        uses: actions/gh@v3
+        with:
+          cli_version: 2.0.0
+
+      - name: List merged PRs
+        run: |
+          gh pr list --search 'is:merged'
+
       # tag format: trigger-v2023-06-01-0915
       - name: Get triggered tag
         id: trigger_tag
