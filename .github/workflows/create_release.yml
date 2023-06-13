@@ -76,27 +76,23 @@ jobs:
           echo ${{ steps.pr_list.outputs.pr_list }}
           
 
-      - name: print pr
+      - name: Get changelog
+        id: changelog
         run: |
-          echo ${{ github.event.pull_request }}
+          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b></br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
 
-
-#
-#      - name: Get changelog
-#        id: changelog
-#        run: |
-#          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b></br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
-#
-#      - name: Create a release
-#        uses: ncipollo/release-action@v1
-#        with:
-#          tag: ${{ steps.new.outputs.tag }}
-#          name: Release ${{ steps.new.outputs.tag }}
-#          makeLatest: true
-#          body: >
-#            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
-#            <br/>
-#            <br/>
-#            ${{ steps.changelog.outputs.changelog }}
-#            <br/>
-#            deployed by @${{ github.actor }}
+      - name: Create a release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.new.outputs.tag }}
+          name: Release ${{ steps.new.outputs.tag }}
+          makeLatest: true
+          body: >
+            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
+            ## PR LIST
+            ${{ steps.pr_list.outputs.pr_list }}
+            <br/>
+            ## CHANGELOG
+            ${{ steps.changelog.outputs.changelog }}
+            <br/>
+            deployed by @${{ github.actor }}
