@@ -61,11 +61,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo ::set-output name=pr_list::$(gh pr list --search "is:merged merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}')
+          echo ::set-output name=pr_list::$(gh pr list --search "is:merged merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}' | sed 's/#/\n#/g')
 
       - name: print pr list
         run: |
-          echo "${{ steps.pr_list.outputs.pr_list }}" | sed 's/#/\n#/g'
+          echo "${{ steps.pr_list.outputs.pr_list }}" 
 
 
       - name: Get changelog
