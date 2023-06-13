@@ -64,33 +64,11 @@ jobs:
           echo ::set-output name=latest::$(echo '${{ steps.merged_pr.outputs.commit }}' | head -n 1 | cut -d' ' -f1)
           echo ::set-output name=oldest::$(echo '${{ steps.merged_pr.outputs.commit }}' | tail -n 1 | cut -d' ' -f1)
 
-#      - name: checkout and status
-#        run: |
-#          git checkout main
-#          git status
-
-      - name: git show
-        run: |
-          git show
-
-      - name: using api
+      - name: List merged PRs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh api -X GET /repos/hslim8888/test-action/pulls\?state=closed
-
-      - name: pr list
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr list --search "is:merged"
-
-
-#      - name: List merged PRs
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        run: |
-#          echo ::set-output name=pr_list::$(gh pr list --search "is:pr is:merged" --repo=hslim8888/test-action | awk -F '\t' '{print "#" $1, $2, $3}')
+          echo ::set-output name=pr_list::$(gh pr list --search "is:merged" | awk -F '\t' '{print "#" $1, $2, $3}')
 
       - name: print pr list
         run: |
