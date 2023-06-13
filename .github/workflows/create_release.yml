@@ -16,7 +16,7 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 2
 
       # tag format: trigger-v2023-06-01-0915
       - name: Get triggered tag
