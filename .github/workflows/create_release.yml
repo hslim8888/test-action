@@ -61,8 +61,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          output=$(gh pr list --search "is:merged merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}')
-          echo "::set-output name=pr_list::$output"
+          pr_list=$(gh pr list --search "is:merged" | awk -F '\t' '{print "#" $1, $2, $3}')
+          pr_list="${pr_list//$'\n'/'%0A'}"  
+          echo "::set-output name=pr_list::$pr_list"
+
+#          echo ::set-output name=pr_list::$(gh pr list --search "is:merged merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}')
 
       - name: print pr list
         run: |
@@ -85,7 +88,7 @@ jobs:
             <br/>
             <b>PR LIST</b>
             <br/>
-            $(echo "${{ steps.pr_list.outputs.pr_list }}" | sed 's/#/\n#/g')
+            ${{ steps.pr_list.outputs.pr_list }}
             <br/>
             <br/>
             <br/>
