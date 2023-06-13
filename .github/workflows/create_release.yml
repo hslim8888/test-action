@@ -77,6 +77,11 @@ jobs:
       - name: print pr list
         run: |
           echo ${{ steps.pr_list.outputs.pr_list }}
+          
+
+      - name: print pr
+        run: |
+          echo ${{ github.event.pull_request }}
 
 
 #
