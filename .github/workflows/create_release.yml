@@ -61,7 +61,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pr_list=$(gh pr list --search "is:merged" | awk -F '\t' '{print "#" $1, $2, $3}')
+          pr_list=$(gh pr list --search "is:merged merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}')
           pr_list="${pr_list//$'\n'/'%0A'}"  
           echo "::set-output name=pr_list::$pr_list"
 
