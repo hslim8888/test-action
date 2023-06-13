@@ -70,7 +70,7 @@ jobs:
 
       - name: print pr list
         run: |
-          echo "${{ steps.pr_list_line.outputs.pr_list }}" 
+          echo ${{ steps.pr_list_line.outputs.pr_list }} 
 
 
       - name: Get changelog
@@ -90,7 +90,7 @@ jobs:
             <br/>
             <b>PR LIST</b>
             <br/>
-            ${{ steps.pr_list.outputs.pr_list }} 
+            $(echo "${{ steps.pr_list.outputs.pr_list }}" | sed 's/#/\n#/g')
             <br/>
             <br/>
             <br/>
