@@ -54,6 +54,10 @@ jobs:
         run: |
           echo ::set-output name=commit::$(git log --merges --oneline ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }} | grep "Merge pull request") 
 
+      - name: print merged pr
+        run: |
+          echo ${{ steps.merged_pr.outputs.commit }}
+
       - name: merged commit
         id: merged_commit
         run: |
