@@ -59,6 +59,11 @@ jobs:
           echo ::set-output name=latest::$(echo '${{ steps.merged_pr.outputs.commit }}' | head -n 1 | cut -d' ' -f1)
           echo ::set-output name=oldest::$(echo '${{ steps.merged_pr.outputs.commit }}' | tail -n 1 | cut -d' ' -f1)
 
+      - name: checkout and status
+        run: |
+          git checkout main
+          git status
+
       - name: List merged PRs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
