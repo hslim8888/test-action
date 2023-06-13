@@ -18,9 +18,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: fetch origin
-        run: |
-          git checkout main && git fetch origin ${{ github.event.pull_request.head.ref }} --depth=1
+#      - name: fetch origin
+#        run: |
+#          git checkout main && git fetch origin ${{ github.event.pull_request.head.ref }} --depth=1
 
       # tag format: trigger-v2023-06-01-0915
       - name: Get triggered tag
@@ -81,7 +81,7 @@ jobs:
       - name: pr list
         id: prr
         run: |
-          git log --merges --oneline main | grep "Merge pull request"
+          git checkout main && git fetch && git log --merges --oneline main | grep "Merge pull request"
           
 
       - name: Get changelog
