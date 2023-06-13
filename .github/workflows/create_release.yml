@@ -69,7 +69,6 @@ jobs:
         run: |
           echo ${{ steps.pr_list.outputs.pr_list }}
 
-
       - name: Get changelog
         id: changelog
         run: |
