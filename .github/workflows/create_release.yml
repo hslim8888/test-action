@@ -52,37 +52,22 @@ jobs:
           echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
           echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
 
-      - name: get pr merged commit
-        id: merged_pr
-        run: |
-          echo ::set-output name=commit::$(git log --merges --oneline f8e5c87d959c0ebecd3ee6ffe906a35457cd77ba..35dec43d6c44b6e3bc4033ff14ca91b11c6f606e | grep "Merge pull request") 
-
-      - name: print merged pr
-        run: |
-          echo ${{ steps.merged_pr.outputs.commit }}
-
       - name: merged commit
         id: merged_commit
         run: |
-          echo ::set-output name=latest::$(echo '${{ steps.merged_pr.outputs.commit }}' | head -n 1 | cut -d' ' -f1)
-          echo ::set-output name=oldest::$(echo '${{ steps.merged_pr.outputs.commit }}' | tail -n 1 | cut -d' ' -f1)
+          echo ::set-output name=latest::$(echo git log --merges --oneline ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }} | grep "Merge pull request" | head -n 1 | cut -d' ' -f1)
+          echo ::set-output name=oldest::$(echo git log --merges --oneline ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }} | grep "Merge pull request" | tail -n 1 | cut -d' ' -f1)
 
       - name: List merged PRs
         id: pr_list
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo ::set-output name=pr_list::$(git checkout main && git fetch && gh pr list --search "${{ steps.merged_commit.outputs.oldest }}..${{ steps.merged_commit.outputs.latest }} is:merged" | awk -F '\t' '{print "#" $1, $2, $3}')
+          echo ::set-output name=pr_list::$(gh pr list --search "${{ steps.merged_commit.outputs.oldest }}..${{ steps.merged_commit.outputs.latest }} is:merged" | awk -F '\t' '{print "#" $1, $2, $3}')
 
       - name: print pr list
         run: |
           echo ${{ steps.pr_list.outputs.pr_list }}
-
-      - name: pr list
-        id: prr
-        run: |
-          git checkout main && git fetch && git log --merges --oneline main | grep "Merge pull request"
-          
 
       - name: Get changelog
         id: changelog
@@ -108,5 +93,3 @@ jobs:
             <br/>
             deployed by @${{ github.actor }}
             
-
-
