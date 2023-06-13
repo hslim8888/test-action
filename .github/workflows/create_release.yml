@@ -17,7 +17,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          submodules: true
 
       # tag format: trigger-v2023-06-01-0915
       - name: Get triggered tag
@@ -52,7 +51,7 @@ jobs:
       - name: get pr merged commit
         id: merged_pr
         run: |
-          echo ::set-output name=commit::$(git log --merges --oneline ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }} | grep "Merge pull request") 
+          echo ::set-output name=commit::$(git log --merges --oneline f8e5c87d959c0ebecd3ee6ffe906a35457cd77ba..35dec43d6c44b6e3bc4033ff14ca91b11c6f606e | grep "Merge pull request") 
 
       - name: print merged pr
         run: |
