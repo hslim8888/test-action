@@ -55,8 +55,8 @@ jobs:
       - name: merged commit
         id: merged_commit
         run: |
-          echo ::set-output name=latest::$(echo $(git log --merges --oneline ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }}) | grep "Merge pull request" | head -n 1 | cut -d' ' -f1)
-          echo ::set-output name=oldest::$(echo $(git log --merges --oneline ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }}) | grep "Merge pull request" | tail -n 1 | cut -d' ' -f1)
+          echo ::set-output name=latest::$(echo $(git log --merges --oneline ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }} | grep "Merge pull request" | head -n 1 | cut -d' ' -f1)
+          echo ::set-output name=oldest::$(echo $(git log --merges --oneline ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }} | grep "Merge pull request" | tail -n 1 | cut -d' ' -f1)
 
       - name: List merged PRs
         id: pr_list
