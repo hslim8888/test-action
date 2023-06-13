@@ -65,7 +65,7 @@ jobs:
 
       - name: print pr list
         run: |
-          echo "${{ steps.pr_list.outputs.pr_list }}" | sed 's/\\n/\n/g'
+          echo "${{ steps.pr_list.outputs.pr_list }}" | sed 's/#/\n#/g'
 
 
       - name: Get changelog
