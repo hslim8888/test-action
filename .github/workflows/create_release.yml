@@ -18,12 +18,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: List merged PRs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr list --search 'is:merged'
-
       # tag format: trigger-v2023-06-01-0915
       - name: Get triggered tag
         id: trigger_tag
@@ -48,11 +42,30 @@ jobs:
         run: |
           echo ${{ steps.annotate_tag.outputs.annotate }}
 
-#      - name: Get latest deploy log
-#        id: latest_log
-#        run: |
-#          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
-#          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+      - name: Get latest deploy log
+        id: latest_log
+        run: |
+          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
+          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+
+      - name: get pr merged commit
+        id: merged_pr
+        run: |
+          echo ::set-output name=commit::$(git log --merges --reverse --oneline --ancestry-path ${{ steps.latest_log.outputs.commit }}..origin | grep "Merge pull request") 
+
+      - name: merged commit
+        id: merged_commit
+        run: |
+          echo ::set-output name=oldest::$(echo ${{ steps.merged_pr.outputs.commit }} | head -n 1 | cut -d' ' -f1)
+          echo ::set-output name=latest::$(echo ${{ steps.merged_pr.outputs.commit }} | tail -n 1 | cut -d' ' -f1)
+
+      - name: List merged PRs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr list --search "${{ steps.merged_commit.outputs.oldest }}..${{ steps:merged_commit.outputs.latest }} is:pr is:merged"
+
+
 #
 #      - name: Get changelog
 #        id: changelog
