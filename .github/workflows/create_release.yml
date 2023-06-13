@@ -78,12 +78,6 @@ jobs:
         run: |
           echo ${{ steps.pr_list.outputs.pr_list }}
 
-      - name: pr list
-        id: prr
-        run: |
-          git checkout main && git fetch && git log --merges --oneline main | grep "Merge pull request"
-          
-
       - name: Get changelog
         id: changelog
         run: |
