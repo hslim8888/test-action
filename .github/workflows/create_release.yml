@@ -77,6 +77,11 @@ jobs:
       - name: print pr list
         run: |
           echo ${{ steps.pr_list.outputs.pr_list }}
+
+      - name: pr list
+        id: prr
+        run: |
+          git log --merges --oneline main | grep "Merge pull request"
           
 
       - name: Get changelog
