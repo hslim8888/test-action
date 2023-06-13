@@ -79,12 +79,18 @@ jobs:
         run: |
           gh api -X GET /repos/hslim8888/test-action/pulls\?state=closed
 
-
-      - name: List merged PRs
+      - name: pr list
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo ::set-output name=pr_list::$(gh pr list --search "is:pr is:merged" --repo=hslim8888/test-action | awk -F '\t' '{print "#" $1, $2, $3}')
+          gh pr list --search "is:merged"
+
+
+#      - name: List merged PRs
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: |
+#          echo ::set-output name=pr_list::$(gh pr list --search "is:pr is:merged" --repo=hslim8888/test-action | awk -F '\t' '{print "#" $1, $2, $3}')
 
       - name: print pr list
         run: |
