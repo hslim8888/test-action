@@ -89,10 +89,13 @@ jobs:
           makeLatest: true
           body: >
             [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
-            ## PR LIST
+            <br/>
+            ##PR LIST
+            <br/>
             ${{ steps.pr_list.outputs.pr_list }}
             <br/>
-            ## CHANGELOG
+            ##CHANGELOG
+            <br/>
             ${{ steps.changelog.outputs.changelog }}
             <br/>
             deployed by @${{ github.actor }}
