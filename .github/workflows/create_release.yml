@@ -77,7 +77,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh api -X GET /repos/hslim8888/test-action/pulls\?state=merged
+          gh api -X GET /repos/hslim8888/test-action/pulls\?state=closed
 
 
       - name: List merged PRs
