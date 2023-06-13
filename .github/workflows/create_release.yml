@@ -32,7 +32,7 @@ jobs:
         run: |
           echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
-          echo ::set-output name=commit_time::$(git show -s --format=%ct ${{ steps.trigger_tag.outputs.tag }})
+          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }})
 
 #      - name: get message if tag is annotate tag
 #        id: annotate_tag
@@ -48,7 +48,7 @@ jobs:
         run: |
           echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
           echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
-          echo ::set-output name=commit_time::$(git show -s --format=%ct $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
 
 #      - name: merged commit
 #        id: merged_commit
@@ -61,7 +61,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo ::set-output name=pr_list::$(gh pr list --search "is:merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}')
+          echo ::set-output name=pr_list::$(gh pr list --search "is:merged merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}')
 
       - name: print pr list
         run: |
