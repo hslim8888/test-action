@@ -14,13 +14,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v1
         with:
           fetch-depth: 0
 
-#      - name: fetch origin
-#        run: |
-#          git checkout main && git fetch origin ${{ github.event.pull_request.head.ref }} --depth=1
+      - name: Get tag annotation
+        id: tag
+        run: |
+          if [ -z "${PROVIDED_TAG}" ]; then
+            TAG_ANNOTATION=$(git for-each-ref "${GITHUB_REF}" --format '%(contents)')
+          else
+            TAG_ANNOTATION=$(git for-each-ref "refs/tags/${PROVIDED_TAG}" --format '%(contents)')
+          fi
+          echo "$TAG_ANNOTATION"
+          echo "::set-output name=annotation::$TAG_ANNOTATION"
+
+      - name: Use tag annotation
+        run: |
+          echo "test Tag annotation: ${{ steps.tag.outputs.annotation }}"
 
       # tag format: trigger-v2023-06-01-0915
       - name: Get triggered tag
@@ -43,47 +54,47 @@ jobs:
         run: |
           echo ${{ steps.annotate_tag.outputs.annotate }}
 
-#      - name: Get latest deploy log
-#        id: latest_log
-#        run: |
-#          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
-#          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
-#          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
-#
-#      - name: List merged PRs
-#        id: pr_list
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        run: |
-#          pr_list=$(gh pr list --search "is:merged merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}')
-#          pr_list="${pr_list//$'\n'/'%0A'}"
-#          echo "::set-output name=pr_list::$pr_list"
-#
-#      - name: Get changelog
-#        id: changelog
-#        run: |
-#          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b></br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
-#
-#      - name: Create a release
-#        uses: ncipollo/release-action@v1
-#        with:
-#          tag: ${{ steps.new.outputs.tag }}
-#          name: Release ${{ steps.new.outputs.tag }}
-#          makeLatest: true
-#          body: >
-#            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
-#            <br/>
-#            <br/>
-#            <b>PR LIST</b>
-#            <br/>
-#            ${{ steps.pr_list.outputs.pr_list }}
-#            <br/>
-#            <br/>
-#            <br/>
-#            <b>CHANGELOG</b>
-#            <br/>
-#            ${{ steps.changelog.outputs.changelog }}
-#            <br/>
-#            deployed by @${{ github.actor }}
-#
-#
+      - name: Get latest deploy log
+        id: latest_log
+        run: |
+          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
+          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+
+      - name: List merged PRs
+        id: pr_list
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pr_list=$(gh pr list --search "is:merged merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}')
+          pr_list="${pr_list//$'\n'/'%0A'}"
+          echo "::set-output name=pr_list::$pr_list"
+
+      - name: Get changelog
+        id: changelog
+        run: |
+          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b></br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
+
+      - name: Create a release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.new.outputs.tag }}
+          name: Release ${{ steps.new.outputs.tag }} ||  ${{ steps.tag.outputs.annotation }}
+          makeLatest: true
+          body: >
+            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
+            <br/>
+            <br/>
+            <b>PR LIST</b>
+            <br/>
+            ${{ steps.pr_list.outputs.pr_list }}
+            <br/>
+            <br/>
+            <br/>
+            <b>CHANGELOG</b>
+            <br/>
+            ${{ steps.changelog.outputs.changelog }}
+            <br/>
+            deployed by @${{ github.actor }}
+
+
