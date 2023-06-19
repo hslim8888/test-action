@@ -89,6 +89,12 @@ jobs:
         run: |
           echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b></br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
 
+      - name: print pr list
+        run: |
+          echo ${{ steps.pr_list.outputs.pr_list }}
+          changelog_lines=$(echo "$(git log --pretty=format:'%h - %s')" | head -n 3)
+          echo $changelog_lines
+
       - name: make body
         id: body
         run: |
