@@ -92,14 +92,14 @@ jobs:
       - name: print pr list
         run: |
           echo ${{ steps.pr_list.outputs.pr_list }}
-          pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk '{printf "%s", $0}')
+          pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk -F '\t' '{printf "%s", $0}')
           pr_list="${pr_list//$'\n'/'%0A'}"
           echo $pr_list
 
       - name: git log head 3
         id: log_aaa
         run: |
-          log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk '{printf "%s", $0}')
+          log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{printf "%s", $0}')
           log="${log//$'\n'/'%0A'}"
           echo set-output name=log::$log
 
