@@ -43,7 +43,7 @@ jobs:
         run: |
           echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
-          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }})
+          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }} | tail -n 1)
 
       - name: Get latest deploy log
         id: latest_log
@@ -60,6 +60,10 @@ jobs:
           pr_list=$(gh pr list --search "is:merged merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}')
           pr_list="${pr_list//$'\n'/'%0A'}"  
           echo "::set-output name=pr_list::$pr_list"
+
+      - name: print pr list
+        run: |
+          echo ${{ steps.pr_list.outputs.pr_list }}
 
       - name: Get changelog
         id: changelog
@@ -102,6 +106,7 @@ jobs:
           body: >
             [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
             <br/>
+            ${{ steps.deploy_message.outputs.message }}
             <br/>
             <b>PR LIST</b>
             <br/>
