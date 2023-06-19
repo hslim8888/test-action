@@ -76,29 +76,6 @@ jobs:
           fi
           echo "::set-output name=message::$message"
 
-      - name: Create a release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.new.outputs.tag }}
-          name: Release ${{ steps.new.outputs.tag }}
-          makeLatest: true
-          body: >
-            [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
-            <br/>
-            <br/>
-            ${{ steps.deploy_message.outputs.message }}
-            <b>PR LIST</b>
-            <br/>
-            ${{ steps.pr_list.outputs.pr_list }}
-            <br/>
-            <br/>
-            <br/>
-            <b>CHANGELOG</b>
-            <br/>
-            ${{ steps.changelog.outputs.changelog }}
-            <br/>
-            deployed by @${{ github.actor }}
-
       - name: slack body
         id: slack_body
         run: |
@@ -114,6 +91,33 @@ jobs:
             body+="${log}%0A"
           fi
           echo "::set-output name=body::$body"
+
+
+      - name: Create a release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.new.outputs.tag }}
+          name: Release ${{ steps.new.outputs.tag }}
+          makeLatest: true
+          body: >
+            [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
+            <br/>
+            ${{ steps.deploy_message.outputs.message }}
+            <br/>
+            <b>PR LIST</b>
+            <br/>
+            ${{ steps.pr_list.outputs.pr_list }}
+            <br/>
+            <br/>
+            <br/>
+            <b>CHANGELOG</b>
+            <br/>
+            ${{ steps.changelog.outputs.changelog }}
+            <br/>
+            <br/>
+            ${{ steps.slack_body.outputs.body }}
+            deployed by @${{ github.actor }}
+
 
 #      - name: Notify Slack
 #        uses: rtCamp/action-slack-notify@v2
