@@ -102,7 +102,6 @@ jobs:
           body: >
             [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
             <br/>
-            ${{ steps.deploy_message.outputs.message }}
             <br/>
             <b>PR LIST</b>
             <br/>
