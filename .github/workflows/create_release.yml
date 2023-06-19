@@ -107,7 +107,7 @@ jobs:
           log="${log//$'\n'/'%0A'}"  
           echo "::set-output name=log::$log"
 
-      - name: print log
+      - name: print log_aaa
         run: |
           echo ${{ steps.log_aaa.outputs.log }}
 
