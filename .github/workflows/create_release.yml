@@ -107,17 +107,18 @@ jobs:
           log="${log//$'\n'/'%0A'}"  
           echo "::set-output name=log::$log"
 
-      - name: print log_aaa
-        run: |
-          echo ${{ steps.log_aaa.outputs.log }}
+#      - name: print log_aaa
+#        run: |
+#          echo ${{ steps.log_aaa.outputs.log }}
 
       - name: make body
         id: body
         run: |
-          pr_list_lines=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2)
-          log=$(echo "$(git log --pretty=format:'%h - %s')" | head -n 3)
-          log="${log//$'\n'/'%0A'}"
-          four_line_var="${pr_list_lines}${log}"
+          pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk -F '\t' '{print $0}')
+          pr_list="${pr_list//$'\n'/'%0A'}"  
+          log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
+          log="${log//$'\n'/'%0A'}"  
+          four_line_var="${pr_list}${log}"
           echo "::set-output name=four_line_var::${four_line_var}"
       - name: print
         run: |
