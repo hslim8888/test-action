@@ -92,8 +92,8 @@ jobs:
       - name: make body
         id: body
         run: |
-          pr_list_lines=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2)
-          changelog_lines=$(echo "${{ steps.changelog.outputs.changelog }}" | head -n 3)
+          pr_list_lines=$(echo "${{ steps.pr_list.outputs.pr_list }} | head -n 2")
+          changelog_lines=$(echo "$(git log --pretty=format:'%h - %s' | head -n 3)")
           four_line_var="${pr_list_lines}${changelog_lines}"
           echo "::set-output name=four_line_var::${four_line_var}"
       - name: print
