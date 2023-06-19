@@ -93,14 +93,19 @@ jobs:
         run: |
           echo ${{ steps.pr_list.outputs.pr_list }}
           pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2)
-          pr_list="${pr_list_lines//$'\n'/'%0A'}"
+          pr_list="${pr_list//$'\n'/'%0A'}"
           echo $pr_list_lines
 
       - name: git log head 3
+        id: log
         run: |
           log=$(echo "$(git log --pretty=format:'%h - %s')" | head -n 3)
-          log="${log//$'\n'/'%0A'}"
-          echo $log
+          log="${log//$'\n'/'%0A'}"  
+          echo "::set-output name=pr_list::$pr_list"
+
+      - name: print log
+        run: |
+          echo ${{ steps.log.outputs.log }}
 
       - name: make body
         id: body
