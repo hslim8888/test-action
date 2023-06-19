@@ -79,7 +79,7 @@ jobs:
           message=""
           if [ -n "$annotation" ]; then
             message+="*${tag} (${release_url}): ${annotation}*%0A%0A"
-          else:
+          else
             message+="*${tag} (${release_url})*%0A%0A"
           fi
           echo "::set-output name=message::$message"
