@@ -92,7 +92,7 @@ jobs:
       - name: print pr list
         run: |
           echo ${{ steps.pr_list.outputs.pr_list }}
-          pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk '{printf "%s", $0})
+          pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk '{printf "%s", $0}')
           pr_list="${pr_list//$'\n'/'%0A'}"
           echo $pr_list
 
