@@ -119,31 +119,33 @@ jobs:
           log="${log//$'\n'/'%0A'}"  
           four_line_var="${pr_list}${log}"
           echo "::set-output name=four_line_var::$four_line_var"
-      - name: print
-        run: |
-          echo ${{ steps.body.outputs.four_line_var }}
+#      - name: print
+#        run: |
+#          echo ${{ steps.body.outputs.four_line_var }}
 
 
-#      - name: Create a release
-#        uses: ncipollo/release-action@v1
-#        with:
-#          tag: ${{ steps.new.outputs.tag }}
-#          name: Release ${{ steps.new.outputs.tag }} ||  ${{ steps.tag.outputs.annotation }}
-#          makeLatest: true
-#          body: >
-#            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
-#            <br/>
-#            <br/>
-#            <b>PR LIST</b>
-#            <br/>
-#            ${{ steps.pr_list.outputs.pr_list }}
-#            <br/>
-#            <br/>
-#            <br/>
-#            <b>CHANGELOG</b>
-#            <br/>
-#            ${{ steps.changelog.outputs.changelog }}
-#            <br/>
-#            deployed by @${{ github.actor }}
+      - name: Create a release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.new.outputs.tag }}
+          name: Release ${{ steps.new.outputs.tag }} ||  ${{ steps.tag.outputs.annotation }}
+          makeLatest: true
+          body: >
+            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
+            <br/>
+            <br/>
+            <b>PR LIST</b>
+            <br/>
+            ${{ steps.pr_list.outputs.pr_list }}
+            <br/>
+            <br/>
+            <br/>
+            <b>CHANGELOG</b>
+            <br/>
+            ${{ steps.changelog.outputs.changelog }}
+            <br/>
+            <br/>
+            ${{ steps.body.outputs.four_line_var }}
+            deployed by @${{ github.actor }}
 
 
