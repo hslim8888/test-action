@@ -106,10 +106,7 @@ jobs:
           pr_list="${pr_list//$'\n'/'%0A'}"  
           log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
           log="${log//$'\n'/'%0A'}"
-          body=""
-          if [ -n "${ steps.deploy_message.outputs.message }" ]; then
-             body+="${steps.deploy_message.outputs.message}%0A"
-          fi
+          body="${{ steps.deploy_message.outputs.message }}"
           if [ -n "$pr_list" ]; then
             body+="${pr_list}%0A"
           fi
