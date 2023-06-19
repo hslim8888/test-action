@@ -4,8 +4,8 @@ on:
     # 여기에 branches를 넣으면 or 조건으로 동작함
     # tags 로만 트리거 되는 동작은 github.ref 가 refs/tags/{tag-name} 이고,
     # checkout 을 하면 detached HEAD 상태로 동작
-        # 또한, 태그 ref를 가져오기 위해 fetch-depth: 0 을 꼭 해줘야 함. 아니면 해당 커밋만 가져옴.
-        # 브랜치 정보를 가져올 수 없어서 main 여부 체크를 할 수 없음.
+    # 또한, 태그 ref를 가져오기 위해 fetch-depth: 0 을 꼭 해줘야 함. 아니면 해당 커밋만 가져옴.
+    # 브랜치 정보를 가져올 수 없어서 main 여부 체크를 할 수 없음.
     tags:
       - 'trigger*'
 
@@ -29,8 +29,9 @@ jobs:
           echo "$TAG_ANNOTATION"
           echo "::set-output name=annotation::$TAG_ANNOTATION"
 
-          
-
+      - name: Use tag annotation
+        run: |
+          echo "test Tag annotation: ${{ steps.tag.outputs.annotation }}"
 
       # tag format: trigger-v2023-06-01-0915
       - name: Get triggered tag
@@ -42,31 +43,7 @@ jobs:
         run: |
           echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
-          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }} | tail -n 1)
-
-      - name: print new
-        run: |
-          echo ${{ steps.new.outputs.commit }}
-          echo ${{ steps.new.outputs.tag }}
-          echo ${{ steps.new.outputs.commit_time }}
-
-      - name: deploy log title
-        id: deploy_log_title
-        run: |
-          echo ::set-output name=title::${{ steps.tag.outputs.annotation || steps.new.outputs.tag }}
-
-      - name: print title
-        run: |
-          echo ${{ steps.deploy_log_title.outputs.title }}
-
-      - name: get message if tag is annotate tag
-        id: annotate_tag
-        run: |
-          echo ::set-output name=annotate::$(git checkout main && git fetch && git tag -l --format='%(contents)' ${{ steps.trigger_tag.outputs.tag }})
-
-      - name: print annotate message
-        run: |
-          echo ${{ steps.annotate_tag.outputs.annotate }}
+          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }})
 
       - name: Get latest deploy log
         id: latest_log
@@ -87,54 +64,29 @@ jobs:
       - name: Get changelog
         id: changelog
         run: |
-          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b></br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
+          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/mediquitous-dev/zelda/commit/%h) - %s</br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
 
-      - name: print pr list
-        id: prrr
+      - name: deploy message
+        id: deploy_message
         run: |
-          pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk -F '\t' '{print $0}')
-          pr_list="${pr_list//$'\n'/'%0A'}"  
-          echo "::set-output name=pr_list::$pr_list"
-
-      - name: print prrr
-        run: |
-          echo ${{ steps.prrr.outputs.pr_list }}
-
-      - name: git log head 3
-        id: log_aaa
-        run: |
-          log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
-          echo "::set-output name=log::$log"
-
-#      - name: print log_aaa
-#        run: |
-#          echo ${{ steps.log_aaa.outputs.log }}
-
-      - name: make body
-        id: body
-        run: |
-          pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk -F '\t' '{print $0}')
-          pr_list="${pr_list//$'\n'/'%0A'}"  
-          log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
-          log="${log//$'\n'/'%0A'}"  
-          body="%0A**약 7분 이후에 배포가 완료됩니다.**%0A%0A%0A${{ steps.tag.outputs.annotation }}%0A${pr_list}%0A${log}%0A"
-          echo "::set-output name=body::$body"
-
-#      - name: print
-#        run: |
-#          echo ${{ steps.body.outputs.four_line_var }}
-
+          annotation="${{ steps.tag.outputs.annotation }}"
+          message=""
+          if [ -n "$annotation" ]; then
+            message+="*배포 사유: ${annotation}*%0A"
+          fi
+          echo "::set-output name=message::$message"
 
       - name: Create a release
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.new.outputs.tag }}
-          name: Release ${{ steps.new.outputs.tag }} ||  ${{ steps.tag.outputs.annotation }}
+          name: Release ${{ steps.new.outputs.tag }}
           makeLatest: true
           body: >
-            [Compare link](https://github.com/hslim8888/test-action/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
+            [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
             <br/>
             <br/>
+            ${{ steps.deploy_message.outputs.message }}
             <b>PR LIST</b>
             <br/>
             ${{ steps.pr_list.outputs.pr_list }}
@@ -145,8 +97,35 @@ jobs:
             <br/>
             ${{ steps.changelog.outputs.changelog }}
             <br/>
-            <br/>
-            ${{ steps.body.outputs.body }}
             deployed by @${{ github.actor }}
 
+      - name: slack body
+        id: slack_body
+        run: |
+          pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk -F '\t' '{print $0}')
+          pr_list="${pr_list//$'\n'/'%0A'}"  
+          log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
+          log="${log//$'\n'/'%0A'}"
+          body=""
+          if [ -n "${ steps.deploy_message.outputs.message }" ]; then
+             body+="${steps.deploy_message.outputs.message}%0A"
+          fi
+          if [ -n "$pr_list" ]; then
+            body+="${pr_list}%0A"
+          fi
+          if [ -n "$log" ]; then
+            body+="${log}%0A"
+          fi
+          echo "::set-output name=body::$body"
 
+#      - name: Notify Slack
+#        uses: rtCamp/action-slack-notify@v2
+#        env:
+#          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+#          SLACK_CHANNEL: 'team_개발사업부'
+#          SLACK_MESSAGE: ${{ steps.slack_body.outputs.body }}
+#          SLACK_USERNAME: 'deploy-bot'
+#          SLACK_ICON: 'https://image.lexica.art/full_jpg/340b0fc2-c10a-471b-84f8-271d252b7704'
+#          SLACK_TITLE: 'www.nugu.jp 에 배포가 시작되었습니다. 약 7분 후에 완료됩니다.'
+#          SLACK_FOOTER: ''
+#          MSG_MINIMAL: true
