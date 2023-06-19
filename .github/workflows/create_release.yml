@@ -44,6 +44,12 @@ jobs:
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
           echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }})
 
+      - name: print new
+        run: |
+          echo ${{ steps.new.outputs.commit }}
+          echo ${{ steps.new.outputs.tag }}
+          echo ${{ steps.new.outputs.commit_time }}
+
       - name: deploy log title
         id: deploy_log_title
         run: |
