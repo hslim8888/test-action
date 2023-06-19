@@ -103,7 +103,7 @@ jobs:
       - name: git log head 3
         id: log_aaa
         run: |
-          log=$(git log --pretty=format:'%h - %s' | head -n 3')
+          log=$(git log --pretty=format:'%h - %s' | head -n 3)
           echo "::set-output name=log::$log"
 
       - name: print log_aaa
