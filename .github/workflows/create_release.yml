@@ -59,36 +59,48 @@ jobs:
         run: |
           echo ${{ steps.deploy_log_title.outputs.title }}
 
-#      - name: get message if tag is annotate tag
-#        id: annotate_tag
-#        run: |
-#          echo ::set-output name=annotate::$(git checkout main && git fetch && git tag -l --format='%(contents)' ${{ steps.trigger_tag.outputs.tag }})
-#
-#      - name: print annotate message
-#        run: |
-#          echo ${{ steps.annotate_tag.outputs.annotate }}
-#
-#      - name: Get latest deploy log
-#        id: latest_log
-#        run: |
-#          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
-#          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
-#          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
-#
-#      - name: List merged PRs
-#        id: pr_list
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        run: |
-#          pr_list=$(gh pr list --search "is:merged merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}')
-#          pr_list="${pr_list//$'\n'/'%0A'}"
-#          echo "::set-output name=pr_list::$pr_list"
-#
-#      - name: Get changelog
-#        id: changelog
-#        run: |
-#          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b></br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
-#
+      - name: get message if tag is annotate tag
+        id: annotate_tag
+        run: |
+          echo ::set-output name=annotate::$(git checkout main && git fetch && git tag -l --format='%(contents)' ${{ steps.trigger_tag.outputs.tag }})
+
+      - name: print annotate message
+        run: |
+          echo ${{ steps.annotate_tag.outputs.annotate }}
+
+      - name: Get latest deploy log
+        id: latest_log
+        run: |
+          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
+          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+
+      - name: List merged PRs
+        id: pr_list
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pr_list=$(gh pr list --search "is:merged merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}')
+          pr_list="${pr_list//$'\n'/'%0A'}"
+          echo "::set-output name=pr_list::$pr_list"
+
+      - name: Get changelog
+        id: changelog
+        run: |
+          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/hslim8888/test-action/commit/%h) - <b>%s</b></br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
+
+      - name: make body
+        id: body
+        run: |
+          pr_list_lines=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2)
+          changelog_lines=$(echo "${{ steps.changelog.outputs.changelog }}" | head -n 3)
+          four_line_var="${pr_list_lines}${changelog_lines}"
+          echo "::set-output name=four_line_var::${four_line_var}"
+      - name: print
+        run: |
+          echo ${{ steps.body.outputs.four_line_var }}
+
+
 #      - name: Create a release
 #        uses: ncipollo/release-action@v1
 #        with:
@@ -110,5 +122,5 @@ jobs:
 #            ${{ steps.changelog.outputs.changelog }}
 #            <br/>
 #            deployed by @${{ github.actor }}
-#
-#
+
+
