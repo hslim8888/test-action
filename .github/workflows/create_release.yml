@@ -78,9 +78,9 @@ jobs:
           release_url="https://github.com/mediquitous-dev/zelda/releases/tag/${tag}"
           message=""
           if [ -n "$annotation" ]; then
-            body+="*${tag} (${release_url}): ${annotation}*%0A%0A"
+            message+="*${tag} (${release_url}): ${annotation}*%0A%0A"
           else:
-            body+="*${tag} (${release_url})*%0A%0A"
+            message+="*${tag} (${release_url})*%0A%0A"
           fi
           echo "::set-output name=message::$message"
 
