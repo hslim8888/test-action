@@ -74,25 +74,34 @@ jobs:
         id: deploy_message
         run: |
           annotation="${{ steps.tag.outputs.annotation }}"
+          tag="${{ steps.new.outputs.tag }}"
+          release_url="https://github.com/mediquitous-dev/zelda/releases/tag/${tag}"
           message=""
           if [ -n "$annotation" ]; then
-            message+="*배포 사유: ${annotation}*%0A"
+            body+="*${tag} (${release_url}): ${annotation}*%0A%0A"
+          else:
+            body+="*${tag} (${release_url})*%0A%0A"
           fi
           echo "::set-output name=message::$message"
 
       - name: slack body
         id: slack_body
         run: |
+          deploy_message="${{ steps.deploy_message.outputs.message }}"
+          release_url="https://github.com/mediquitous-dev/zelda/releases/tag/${tag}"
           pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk -F '\t' '{print $0}')
           pr_list="${pr_list//$'\n'/'%0A'}"  
           log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
           log="${log//$'\n'/'%0A'}"
-          body="${{ steps.deploy_message.outputs.message }}"
+          body=""
+          if [ -n "$deploy_message" ]; then
+            body+="${deploy_message}%0A%0A"
+          fi
           if [ -n "$pr_list" ]; then
-            body+="${pr_list}%0A"
+            body+="${pr_list}%0A%0A"
           fi
           if [ -n "$log" ]; then
-            body+="${log}%0A"
+            body+="${log}%0A%0A"
           fi
           echo "::set-output name=body::$body"
 
