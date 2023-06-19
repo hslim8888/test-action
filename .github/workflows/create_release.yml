@@ -29,27 +29,30 @@ jobs:
           echo "$TAG_ANNOTATION"
           echo "::set-output name=annotation::$TAG_ANNOTATION"
 
+          
+
+
+      # tag format: trigger-v2023-06-01-0915
+      - name: Get triggered tag
+        id: trigger_tag
+        run: |
+          echo ::set-output name=tag::$(git describe --tags --abbrev=0 | grep trigger)
+      - name: Set new info
+        id: new
+        run: |
+          echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
+          echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
+          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }})
+
       - name: deploy log title
         id: deploy_log_title
         run: |
-          echo ::set-output name=::${{ steps.tag.outputs.annotation || Release ${{ steps.new.outputs.tag }} }}
+          echo ::set-output name=::${{ steps.tag.outputs.annotation || steps.new.outputs.tag }}
 
       - name: print title
         run: |
           echo ${{ steps.deploy_log_title.outputs.title }}
 
-#      # tag format: trigger-v2023-06-01-0915
-#      - name: Get triggered tag
-#        id: trigger_tag
-#        run: |
-#          echo ::set-output name=tag::$(git describe --tags --abbrev=0 | grep trigger)
-#      - name: Set new info
-#        id: new
-#        run: |
-#          echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
-#          echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
-#          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }})
-#
 #      - name: get message if tag is annotate tag
 #        id: annotate_tag
 #        run: |
