@@ -42,7 +42,7 @@ jobs:
         run: |
           echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
-          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }})
+          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }} | tail -n 1)
 
       - name: print new
         run: |
