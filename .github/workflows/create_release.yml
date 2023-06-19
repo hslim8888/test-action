@@ -104,12 +104,11 @@ jobs:
         id: log_aaa
         run: |
           log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
-          log="${log//$'\n'/'%0A'}"  
           echo "::set-output name=log::$log"
 
-#      - name: print log_aaa
-#        run: |
-#          echo ${{ steps.log_aaa.outputs.log }}
+      - name: print log_aaa
+        run: |
+          echo ${{ steps.log_aaa.outputs.log }}
 
       - name: make body
         id: body
