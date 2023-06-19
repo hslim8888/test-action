@@ -47,7 +47,7 @@ jobs:
       - name: deploy log title
         id: deploy_log_title
         run: |
-          echo ::set-output name=::${{ steps.tag.outputs.annotation || steps.new.outputs.tag }}
+          echo ::set-output title=::${{ steps.tag.outputs.annotation || steps.new.outputs.tag }}
 
       - name: print title
         run: |
