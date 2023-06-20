@@ -89,11 +89,10 @@ jobs:
         run: |
           deploy_message="${{ steps.deploy_message.outputs.message }}"
           pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2)
+          echo $pr_list
           log=$(git log --pretty=format:'%h - %s' | head -n 3)
+          echo $log
           body=""
-          if [ -n "$deploy_message" ]; then
-            body+="${deploy_message}\n\n"
-          fi
           if [ -n "$pr_list" ]; then
             body+="${pr_list}\n\n"
           fi
@@ -138,7 +137,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "${{ steps.slack_body.outputs.body }}"
+                    "text": "${{ steps.deploy_message.outputs.message }}"
                   }
                 }
               ]
