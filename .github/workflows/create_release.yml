@@ -137,7 +137,7 @@ jobs:
                   "type": "section",
                   "text": {
                     "type": "mrkdwn",
-                    "text": "${{ steps.deploy_message.outputs.message }}"
+                    "text": "[마크다운 테스트](https://github.com/hslim8888/test-action/actions/runs/5317667896/jobs/9628420526)"
                   }
                 }
               ]
