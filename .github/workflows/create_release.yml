@@ -97,10 +97,12 @@ jobs:
           if [ -n "$pr_list" ]; then
             body+="${pr_list}\n\n"
           fi
+          echo "::set-output name=body::$body"
+
 #          if [ -n "$log" ]; then
 #            body+="${log}\n\n"
 #          fi
-          echo "::set-output name=body::$body"
+
 
       - name: print slack body
         run: |
