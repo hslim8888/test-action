@@ -100,6 +100,9 @@ jobs:
             body+="${log}\n\n"
           fi
           echo "::set-output name=body::$body"
+      - name: print body
+        run: |
+          echo ${{ steps.slack_body.outputs.body }}
 
       #      - name: Create a release
       #        uses: ncipollo/release-action@v1
