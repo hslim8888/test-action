@@ -137,6 +137,7 @@ jobs:
           channel-id: "test"
           payload: |
             {
+              "text": "",
               "blocks": [
                 {
                   "type": "section",
