@@ -78,9 +78,9 @@ jobs:
           release_url="https://github.com/mediquitous-dev/zelda/releases/tag/${tag}"
           message=""
           if [ -n "$annotation" ]; then
-            message+="\[${tag}\](${release_url}): ${annotation}"
+            message+="[${tag}](${release_url}): ${annotation}"
           else
-            message+="\[${tag}\](${release_url})"
+            message+="[${tag}](${release_url})"
           fi
           echo "::set-output name=message::$message"
 
@@ -97,9 +97,9 @@ jobs:
           if [ -n "$pr_list" ]; then
             body+="${pr_list}\n\n"
           fi
-          if [ -n "$log" ]; then
-            body+="${log}\n\n"
-          fi
+#          if [ -n "$log" ]; then
+#            body+="${log}\n\n"
+#          fi
           echo "::set-output name=body::$body"
 
       - name: print slack body
