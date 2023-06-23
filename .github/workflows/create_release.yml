@@ -21,9 +21,11 @@ jobs:
       - name: date format
         id: date
         run: |
-          result="2023-06-23T11:26:11+09:00"
-          new_result=$(TZ="Asia/Tokyo" date -u -d "$result + 1 second" +"%Y-%m-%dT%H:%M:%S%z")
-          echo "$new_result"
+          echo ::set-output name=commit_time::$(date -d "$(git show -s --format=%cd --date=iso-strict $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)) +1 second" --iso-8601=seconds)
+
+#          result="2023-06-23T11:26:11+09:00"
+#          new_result=$(date -u -d "$result + 1 second" +"%Y-%m-%dT%H:%M:%S%z")
+#          echo "$new_result"
 
 
 #      - name: Get tag annotation
