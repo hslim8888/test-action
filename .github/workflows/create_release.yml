@@ -18,147 +18,155 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get tag annotation
-        id: tag
+      - name: date format
+        id: date
         run: |
-          if [ -z "${PROVIDED_TAG}" ]; then
-            TAG_ANNOTATION=$(git for-each-ref "${GITHUB_REF}" --format '%(contents)')
-          else
-            TAG_ANNOTATION=$(git for-each-ref "refs/tags/${PROVIDED_TAG}" --format '%(contents)')
-          fi
-          echo "$TAG_ANNOTATION"
-          echo "::set-output name=annotation::$TAG_ANNOTATION"
-
-      - name: Use tag annotation
-        run: |
-          echo "test Tag annotation: ${{ steps.tag.outputs.annotation }}"
-
-      # tag format: trigger-v2023-06-01-0915
-      - name: Get triggered tag
-        id: trigger_tag
-        run: |
-          echo ::set-output name=tag::$(git describe --tags --abbrev=0 | grep trigger)
-      - name: Set new info
-        id: new
-        run: |
-          echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
-          echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
-          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }} | tail -n 1)
-
-      - name: Get latest deploy log
-        id: latest_log
-        run: |
-          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
-          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
-          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
-
-      - name: List merged PRs
-        id: pr_list
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          pr_list=$(gh pr list --search "is:merged merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}')
-          pr_list="${pr_list//$'\n'/'%0A'}"  
-          echo "::set-output name=pr_list::$pr_list"
-
-      - name: print pr list
-        run: |
-          echo ${{ steps.pr_list.outputs.pr_list }}
-
-      - name: Get changelog
-        id: changelog
-        run: |
-          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/mediquitous-dev/zelda/commit/%h) - %s</br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
-
-      - name: deploy message
-        id: deploy_message
-        run: |
-          annotation="${{ steps.tag.outputs.annotation }}"
-          tag="${{ steps.new.outputs.tag }}"
-          release_url="https://github.com/mediquitous-dev/zelda/releases/tag/${tag}"
-          message=""
-          if [ -n "$annotation" ]; then
-            message+="*<${release_url}|${tag}>: ${annotation}*"
-          else
-            message+="*<${release_url}|${tag}>*"
-          fi
-          echo "::set-output name=message::$message"
-
-      - name: slack body
-        id: slack_body
-        run: |
-          deploy_message="${{ steps.deploy_message.outputs.message }}"
-          pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2)
-          echo $pr_list
-          log=$(git log --pretty=format:'%h - %s' | head -n 3)
-          echo $log
-          body=""
-          if [ -n "$pr_list" ]; then
-            body+="${pr_list}\n\n"
-          fi
-          if [ -n "$log" ]; then
-            body+="${log}\n\n"
-          fi
-          echo "::set-output name=body::$body"
-      - name: print body
-        run: |
-          echo ${{ steps.slack_body.outputs.body }}
-
-      #      - name: Create a release
-      #        uses: ncipollo/release-action@v1
-      #        with:
-      #          tag: ${{ steps.new.outputs.tag }}
-      #          name: Release ${{ steps.new.outputs.tag }}
-      #          makeLatest: true
-      #          body: >
-      #            [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
-      #            <br/>
-      #            ${{ steps.deploy_message.outputs.message }}
-      #            <br/>
-      #            <b>PR LIST</b>
-      #            <br/>
-      #            ${{ steps.pr_list.outputs.pr_list }}
-      #            <br/>
-      #            <br/>
-      #            <br/>
-      #            <b>CHANGELOG</b>
-      #            <br/>
-      #            ${{ steps.changelog.outputs.changelog }}
-      #            <br/>
-      #            <br/>
-      #            ${{ steps.slack_body.outputs.body }}
-      #            deployed by @${{ github.actor }}
-
-      - name: Notify Slack
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          channel-id: "test"
-          payload: |
-            {
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "${{ steps.slack_body.outputs.body }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          result="2023-06-23T11:26:11+09:00"
+          new_result=$(date -d "$result + 1 second" +"%Y-%m-%dT%H:%M:%S%z")
+          echo "$new_result"
 
 
-
-#      - name: Notify Slack
-#        uses: rtCamp/action-slack-notify@v2
+#      - name: Get tag annotation
+#        id: tag
+#        run: |
+#          if [ -z "${PROVIDED_TAG}" ]; then
+#            TAG_ANNOTATION=$(git for-each-ref "${GITHUB_REF}" --format '%(contents)')
+#          else
+#            TAG_ANNOTATION=$(git for-each-ref "refs/tags/${PROVIDED_TAG}" --format '%(contents)')
+#          fi
+#          echo "$TAG_ANNOTATION"
+#          echo "::set-output name=annotation::$TAG_ANNOTATION"
+#
+#      - name: Use tag annotation
+#        run: |
+#          echo "test Tag annotation: ${{ steps.tag.outputs.annotation }}"
+#
+#      # tag format: trigger-v2023-06-01-0915
+#      - name: Get triggered tag
+#        id: trigger_tag
+#        run: |
+#          echo ::set-output name=tag::$(git describe --tags --abbrev=0 | grep trigger)
+#      - name: Set new info
+#        id: new
+#        run: |
+#          echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
+#          echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
+#          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }} | tail -n 1)
+#
+#      - name: Get latest deploy log
+#        id: latest_log
+#        run: |
+#          echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
+#          echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+#          echo ::set-output name=commit_time::$(git show -s --format=%cd --date=iso-strict $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
+#
+#      - name: List merged PRs
+#        id: pr_list
 #        env:
-#          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-#          SLACK_CHANNEL: 'team_개발사업부'
-#          SLACK_MESSAGE: ${{ steps.slack_body.outputs.body }}
-#          SLACK_USERNAME: 'deploy-bot'
-#          SLACK_ICON: 'https://image.lexica.art/full_jpg/340b0fc2-c10a-471b-84f8-271d252b7704'
-#          SLACK_TITLE: 'www.nugu.jp 에 배포가 시작되었습니다. 약 7분 후에 완료됩니다.'
-#          SLACK_FOOTER: ''
-#          MSG_MINIMAL: true
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run: |
+#          pr_list=$(gh pr list --search "is:merged merged:${{ steps.latest_log.outputs.commit_time }}..${{ steps.new.outputs.commit_time }}" | awk -F '\t' '{print "#" $1, $2, $3}')
+#          pr_list="${pr_list//$'\n'/'%0A'}"
+#          echo "::set-output name=pr_list::$pr_list"
+#
+#      - name: print pr list
+#        run: |
+#          echo ${{ steps.pr_list.outputs.pr_list }}
+#
+#      - name: Get changelog
+#        id: changelog
+#        run: |
+#          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/mediquitous-dev/zelda/commit/%h) - %s</br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
+#
+#      - name: deploy message
+#        id: deploy_message
+#        run: |
+#          annotation="${{ steps.tag.outputs.annotation }}"
+#          tag="${{ steps.new.outputs.tag }}"
+#          release_url="https://github.com/mediquitous-dev/zelda/releases/tag/${tag}"
+#          message=""
+#          if [ -n "$annotation" ]; then
+#            message+="*<${release_url}|${tag}>: ${annotation}*"
+#          else
+#            message+="*<${release_url}|${tag}>*"
+#          fi
+#          echo "::set-output name=message::$message"
+#
+#      - name: slack body
+#        id: slack_body
+#        run: |
+#          deploy_message="${{ steps.deploy_message.outputs.message }}"
+#          pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2)
+#          echo $pr_list
+#          log=$(git log --pretty=format:'%h - %s' | head -n 3)
+#          echo $log
+#          body=""
+#          if [ -n "$pr_list" ]; then
+#            body+="${pr_list}\n\n"
+#          fi
+#          if [ -n "$log" ]; then
+#            body+="${log}\n\n"
+#          fi
+#          echo "::set-output name=body::$body"
+#      - name: print body
+#        run: |
+#          echo ${{ steps.slack_body.outputs.body }}
+#
+#      #      - name: Create a release
+#      #        uses: ncipollo/release-action@v1
+#      #        with:
+#      #          tag: ${{ steps.new.outputs.tag }}
+#      #          name: Release ${{ steps.new.outputs.tag }}
+#      #          makeLatest: true
+#      #          body: >
+#      #            [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
+#      #            <br/>
+#      #            ${{ steps.deploy_message.outputs.message }}
+#      #            <br/>
+#      #            <b>PR LIST</b>
+#      #            <br/>
+#      #            ${{ steps.pr_list.outputs.pr_list }}
+#      #            <br/>
+#      #            <br/>
+#      #            <br/>
+#      #            <b>CHANGELOG</b>
+#      #            <br/>
+#      #            ${{ steps.changelog.outputs.changelog }}
+#      #            <br/>
+#      #            <br/>
+#      #            ${{ steps.slack_body.outputs.body }}
+#      #            deployed by @${{ github.actor }}
+#
+#      - name: Notify Slack
+#        uses: slackapi/slack-github-action@v1.24.0
+#        with:
+#          channel-id: "test"
+#          payload: |
+#            {
+#              "blocks": [
+#                {
+#                  "type": "section",
+#                  "text": {
+#                    "type": "mrkdwn",
+#                    "text": "${{ steps.slack_body.outputs.body }}"
+#                  }
+#                }
+#              ]
+#            }
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+#          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+#
+#
+#
+##      - name: Notify Slack
+##        uses: rtCamp/action-slack-notify@v2
+##        env:
+##          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+##          SLACK_CHANNEL: 'team_개발사업부'
+##          SLACK_MESSAGE: ${{ steps.slack_body.outputs.body }}
+##          SLACK_USERNAME: 'deploy-bot'
+##          SLACK_ICON: 'https://image.lexica.art/full_jpg/340b0fc2-c10a-471b-84f8-271d252b7704'
+##          SLACK_TITLE: 'www.nugu.jp 에 배포가 시작되었습니다. 약 7분 후에 완료됩니다.'
+##          SLACK_FOOTER: ''
+##          MSG_MINIMAL: true
