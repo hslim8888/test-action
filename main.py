@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 def main(*args, **kwargs):
-    trigger_tag = f'trigger-v{datetime.now().strftime("%Y-%m-%d-%H%M")}'
+    trigger_tag = f'trigger-v{datetime.now().strftime("%Y-%m-%d-%H%M%S")}'
     branch = 'main'
     print(args)
     print(kwargs)
