@@ -12,6 +12,7 @@ def main(*args, **kwargs):
     tag = f'-a {trigger_tag} -m "{deploy_message}"' if deploy_message else trigger_tag
     print(tag)
     sh(f'git fetch && git tag {tag} origin/{branch} && git push origin {trigger_tag}')
+    print('done')
 
 
 if __name__ == '__main__':
