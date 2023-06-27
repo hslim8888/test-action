@@ -49,7 +49,7 @@ jobs:
         run: |
           echo ::set-output name=tag::$(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)
           echo ::set-output name=commit::$(git show-ref -s $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p))
-          echo ::set-output name=commit_time::$(date -d "$(git show -s --format=%cd --date=iso-strict $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)) +1 second" --iso-8601=seconds)
+          echo ::set-output name=commit_time::$(TZ="Asia/Seoul" date -d "$(git show -s --format=%cd --date=iso-strict $(git tag --sort=-creatordate | grep -v trigger | sed -n 1p)) +1 second" --iso-8601=seconds)
 
       - name: List merged PRs
         id: pr_list
@@ -63,7 +63,7 @@ jobs:
       - name: Get changelog
         id: changelog
         run: |
-          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/mediquitous-dev/zelda/commit/%h) - %s</br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
+          echo ::set-output name=changelog::$(TZ="Asia/Seoul" git log --pretty=format:"[%h](https://github.com/mediquitous-dev/zelda/commit/%h) - %s</br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
 
       - name: Create GitHub release
         uses: ncipollo/release-action@v1
