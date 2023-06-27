@@ -40,7 +40,7 @@ jobs:
           echo ::set-output name=commit::$(git show-ref -s ${{ steps.trigger_tag.outputs.tag }})
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
           new_commit_time=$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }} | tail -n 1)
-          echo ::set-output name=commit_time::$(date -d "$new_commit_time +1 second" --iso-8601=seconds)
+          echo ::set-output name=commit_time::$(TZ="Asia/Seoul" date -d "$new_commit_time +1 second" --iso-8601=seconds)
           
 
       # {A_commit_time}..{B_commit_time} 을 하면 A_comit_time 포함이기 때문에, 1초를 더해준다.
@@ -63,7 +63,7 @@ jobs:
       - name: Get changelog
         id: changelog
         run: |
-          echo ::set-output name=changelog::$(TZ="Asia/Seoul" git log --pretty=format:"[%h](https://github.com/mediquitous-dev/zelda/commit/%h) - %s</br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
+          echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/mediquitous-dev/zelda/commit/%h) - %s</br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
 
       - name: Create GitHub release
         uses: ncipollo/release-action@v1
