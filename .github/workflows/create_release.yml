@@ -95,12 +95,12 @@ jobs:
           pr_list="${pr_list//$'\n'/'%0A'}"  
           log=$(git log --pretty=format:'%h - %s' | head -n 3)
           echo $log
-          body="*www.nugu.jp 에 배포가 완료되었습니다. <${release_url}|${tag}>*\\n\\n"
+          body="*www.nugu.jp 에 배포가 완료되었습니다. <${release_url}|${tag}>*\n\n"
           if [ -n "$pr_list" ]; then
-            body+="${pr_list}\\n\\n"
+            body+="${pr_list}\n\n"
           fi
           if [ -n "$log" ]; then
-            body+="${log}\\n\\n"
+            body+="${log}\n\n"
           fi
           echo "::set-output name=body::$body"
 
