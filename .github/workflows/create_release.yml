@@ -28,6 +28,9 @@ jobs:
           fi
           echo "$TAG_ANNOTATION"
           echo "::set-output name=annotation::$TAG_ANNOTATION"
+      - name: print annotation
+        run: |
+          echo ${{ steps.tag.outputs.annotation }}
 
       # tag format: trigger-v2023-06-01-0915
       - name: Get triggered tag
