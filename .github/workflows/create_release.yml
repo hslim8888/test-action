@@ -108,8 +108,8 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MSG_AUTHOR: ''
-          SLACK_TITLE: ''
+          SLACK_MSG_AUTHOR: 'a'
+          SLACK_TITLE: 'a'
           SLACK_CHANNEL: 'test'
           SLACK_MESSAGE: ${{ steps.slack_body.outputs.body }}
           SLACK_USERNAME: ${{ github.actor }}
