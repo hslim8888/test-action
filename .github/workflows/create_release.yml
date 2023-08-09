@@ -18,17 +18,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get tag annotation
-        id: tag
-        run: |
-          if [ -z "${PROVIDED_TAG}" ]; then
-            TAG_ANNOTATION=$(git for-each-ref "${GITHUB_REF}" --format '%(contents)')
-          else
-            TAG_ANNOTATION=$(git for-each-ref "refs/tags/${PROVIDED_TAG}" --format '%(contents)')
-          fi
-          echo "$TAG_ANNOTATION"
-          echo "::set-output name=annotation::$TAG_ANNOTATION"
-
       # tag format: trigger-v2023-06-01-0915
       - name: Get triggered tag
         id: trigger_tag
@@ -41,7 +30,6 @@ jobs:
           echo ::set-output name=tag::$(echo ${{ steps.trigger_tag.outputs.tag }} | cut -d'-' -f2-5)
           new_commit_time=$(git show -s --format=%cd --date=iso-strict ${{ steps.trigger_tag.outputs.tag }} | tail -n 1)
           echo ::set-output name=commit_time::$(TZ="Asia/Seoul" date -d "$new_commit_time +1 second" --iso-8601=seconds)
-          
 
       # {A_commit_time}..{B_commit_time} 을 하면 A_comit_time 포함이기 때문에, 1초를 더해준다.
       - name: Get latest deploy log
@@ -65,44 +53,38 @@ jobs:
         run: |
           echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/mediquitous-dev/zelda/commit/%h) - %s</br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
 
-      - name: Create GitHub release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.new.outputs.tag }}
-          name: Release ${{ steps.new.outputs.tag }}
-          makeLatest: true
-          body: >
-            [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
-            <br/>
-            <br/>
-            <b>PR LIST</b>
-            <br/>
-            ${{ steps.pr_list.outputs.pr_list }}
-            <br/>
-            <br/>
-            <br/>
-            <b>CHANGELOG</b>
-            <br/>
-            ${{ steps.changelog.outputs.changelog }}
-            <br/>
-            deployed by @${{ github.actor }}
+#      - name: Create GitHub release
+#        uses: ncipollo/release-action@v1
+#        with:
+#          tag: ${{ steps.new.outputs.tag }}
+#          name: Release ${{ steps.new.outputs.tag }}
+#          makeLatest: true
+#          body: >
+#            [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
+#            <br/>
+#            <br/>
+#            <b>PR LIST</b>
+#            <br/>
+#            ${{ steps.pr_list.outputs.pr_list }}
+#            <br/>
+#            <br/>
+#            <br/>
+#            <b>CHANGELOG</b>
+#            <br/>
+#            ${{ steps.changelog.outputs.changelog }}
+#            <br/>
+#            deployed by @${{ github.actor }}
 
       - name: slack body
         id: slack_body
         run: |
-          annotation="${{ steps.tag.outputs.annotation }}"
           tag="${{ steps.new.outputs.tag }}"
           release_url="https://github.com/mediquitous-dev/zelda/releases/tag/${tag}"
           pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk -F '\t' '{print $0}')
           pr_list="${pr_list//$'\n'/'%0A'}"  
           log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
           log="${log//$'\n'/'%0A'}"
-          body=""
-          if [[ -n "$annotation" && $annotation != Merge* ]]; then
-            body+="*<${release_url}|${tag}>: ${annotation}*%0A%0A"
-          else
-            body+="*<${release_url}|${tag}>*%0A%0A"
-          fi
+          body="*www.nugu.jp 에 배포가 완료되었습니다. <${release_url}|${tag}>*%0A%0A "
           if [ -n "$pr_list" ]; then
             body+="${pr_list}%0A%0A"
           fi
@@ -111,14 +93,14 @@ jobs:
           fi
           echo "::set-output name=body::$body"
 
-#      - name: Notify Slack
-#        uses: rtCamp/action-slack-notify@v2
-#        env:
-#          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-#          SLACK_CHANNEL: 'nugu_renewal'
-#          SLACK_MESSAGE: ${{ steps.slack_body.outputs.body }}
-#          SLACK_USERNAME: 'deploy-bot'
-#          SLACK_ICON: 'https://image.lexica.art/full_jpg/340b0fc2-c10a-471b-84f8-271d252b7704'
-#          SLACK_TITLE: 'www.nugu.jp 에 배포가 시작되었습니다. 약 7분 후에 완료됩니다.'
-#          SLACK_FOOTER: ''
-#          MSG_MINIMAL: true
+      - name: Notify Slack
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MSG_AUTHOR: ''
+          SLACK_CHANNEL: 'test'
+          SLACK_MESSAGE: ${{ steps.slack_body.outputs.body }}
+          SLACK_USERNAME: ${{ github.actor }}
+          SLACK_ICON: 'https://image.lexica.art/full_jpg/340b0fc2-c10a-471b-84f8-271d252b7704'
+          SLACK_FOOTER: ''
+          MSG_MINIMAL: true
