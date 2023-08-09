@@ -102,6 +102,7 @@ jobs:
           if [ -n "$log" ]; then
             body+="${log}\n\n"
           fi
+          body="${body//'%0A'/'\n'}"
           echo "::set-output name=body::$body"
 
       - name: print body
