@@ -110,6 +110,4 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_CHANNEL: 'test'
           SLACK_USERNAME: ${{ github.actor }}
-          SLACK_COLOR: '#36a64f'
-        with:
-          args: ${{ steps.slack_body.outputs.body }}
+          SLACK_CUSTOM_PAYLOAD: '{"text":" ${{ steps.slack_body.outputs.body }} \\n *with* `new` _line_ escaped","username": "{{ GITHUB_ACTOR }}"}'
