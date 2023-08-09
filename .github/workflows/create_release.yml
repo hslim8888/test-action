@@ -18,6 +18,15 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get tag annotation
+        id: tag
+        run: |
+          if [ -n "${PROVIDED_TAG}" ]; then
+            TAG_ANNOTATION=$(git for-each-ref "refs/tags/${PROVIDED_TAG}" --format '%(contents)')
+          fi
+          echo "$TAG_ANNOTATION"
+          echo "::set-output name=annotation::$TAG_ANNOTATION"
+
       # tag format: trigger-v2023-06-01-0915
       - name: Get triggered tag
         id: trigger_tag
@@ -78,6 +87,7 @@ jobs:
       - name: slack body
         id: slack_body
         run: |
+          annotation="${{ steps.tag.outputs.annotation }}"
           tag="${{ steps.new.outputs.tag }}"
           release_url="https://github.com/mediquitous-dev/zelda/releases/tag/${tag}"
           pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk -F '\t' '{print $0}')
@@ -85,6 +95,9 @@ jobs:
           log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
           log="${log//$'\n'/'%0A'}"
           body="*www.nugu.jp 에 배포가 완료되었습니다. <${release_url}|${tag}>*%0A%0A "
+          if [[ -n "$annotation"]]; then
+            body+="*${annotation}*%0A%0A"
+          fi
           if [ -n "$pr_list" ]; then
             body+="${pr_list}%0A%0A"
           fi
