@@ -18,6 +18,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: print PROVIDED_TAG
+        run: |
+          echo ${{ env.PROVIDED_TAG }}
+
       - name: Get tag annotation
         id: tag
         run: |
