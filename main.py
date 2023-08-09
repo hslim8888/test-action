@@ -7,7 +7,7 @@ def main(*args, **kwargs):
     branch = 'main'
     print(args)
     print(kwargs)
-    deploy_message = f'test message {datetime.now().strftime("%Y-%m-%d-%H%M")}' #kwargs.get('m', '')
+    deploy_message = f'test message {datetime.now().strftime("%Y-%m-%d-%H%M")}'  # kwargs.get('m', '')
     print(deploy_message)
     tag = f'-a {trigger_tag} -m "{deploy_message}"' if deploy_message else trigger_tag
     print(tag)
@@ -17,3 +17,6 @@ def main(*args, **kwargs):
 
 if __name__ == '__main__':
     main()
+
+messge = {"attachments": [{"color": "#36a64f", "blocks": [
+    {"type": "section", "text": {"type": "mrkdwn", "text": "${{ steps.slack_body.outputs.body }}"}}]}]}
