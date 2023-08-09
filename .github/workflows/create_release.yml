@@ -94,15 +94,14 @@ jobs:
           pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk -F '\t' '{print $0}')
           pr_list="${pr_list//$'\n'/'%0A'}"  
           log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
-          log="${log//$'\n'/'%0A'}"
-          body="*www.nugu.jp 에 배포가 완료되었습니다.<${release_url}|${tag}>*"
+          body="*www.nugu.jp 에 배포가 완료되었습니다. <${release_url}|${tag}>*"
+          if [ -n "$pr_list" ]; then
+            body+="${pr_list}\\n\\n"
+          fi
+          if [ -n "$log" ]; then
+            body+="${log}\\n\\n"
+          fi
           echo "::set-output name=body::$body"
-#          if [ -n "$pr_list" ]; then
-#            body+="${pr_list}\\n\\n"
-#          fi
-#          if [ -n "$log" ]; then
-#            body+="${log}\\n\\n"
-#          fi
 
       - name: print body
         run: |
