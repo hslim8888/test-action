@@ -115,5 +115,5 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_CHANNEL: 'test'
           SLACK_USERNAME: ${{ github.actor }}
-          SLACK_CUSTOM_PAYLOAD: '{"username": "${{ github.actor }}","attachments": [{"color": "success","blocks": [{"type": "section","text": {"type": "mrkdwn","text": "${{ steps.slack_body.outputs.body }}"}}]}]}'
+          SLACK_CUSTOM_PAYLOAD: '{"username": "${{ github.actor }}","attachments": [{"color": "good","blocks": [{"type": "section","text": {"type": "mrkdwn","text": "${{ steps.slack_body.outputs.body }}"}}]}]}'
 
