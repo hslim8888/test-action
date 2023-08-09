@@ -91,12 +91,8 @@ jobs:
         run: |
           tag="${{ steps.new.outputs.tag }}"
           release_url="https://github.com/mediquitous-dev/zelda/releases/tag/${tag}"
-          pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk -F '\t' '{print $0}')
           log=$(git log --pretty=format:'%h - %s' | head -n 3')
           body="*www.nugu.jp 에 배포가 완료되었습니다. <${release_url}|${tag}>*\\n\\n"
-          if [ -n "$pr_list" ]; then
-            body+="${pr_list}\\n\\n"
-          fi
           if [ -n "$log" ]; then
             body+="${log}\\n\\n"
           fi
