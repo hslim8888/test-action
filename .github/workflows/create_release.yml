@@ -110,7 +110,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MSG_AUTHOR: ''
           SLACK_TITLE: ''
-          SLACK_CHANNEL: 'nugu_renewal'
+          SLACK_CHANNEL: 'test'
           SLACK_MESSAGE: ${{ steps.slack_body.outputs.body }}
           SLACK_USERNAME: ${{ github.actor }}
           SLACK_ICON: 'https://image.lexica.art/full_jpg/340b0fc2-c10a-471b-84f8-271d252b7704'
