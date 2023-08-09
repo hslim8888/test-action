@@ -21,7 +21,9 @@ jobs:
       - name: Get tag annotation
         id: tag
         run: |
-          if [ -n "${PROVIDED_TAG}" ]; then
+          if [ -z "${PROVIDED_TAG}" ]; then
+            TAG_ANNOTATION=$(git for-each-ref "${GITHUB_REF}" --format '%(contents)')
+          else            
             TAG_ANNOTATION=$(git for-each-ref "refs/tags/${PROVIDED_TAG}" --format '%(contents)')
           fi
           echo "$TAG_ANNOTATION"
