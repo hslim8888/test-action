@@ -18,6 +18,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get tag annotation
+        id: tag
+        run: |
+          if [ -z "${PROVIDED_TAG}" ]; then
+            TAG_ANNOTATION=$(git for-each-ref "${GITHUB_REF}" --format '%(contents)')
+          else
+            TAG_ANNOTATION=$(git for-each-ref "refs/tags/${PROVIDED_TAG}" --format '%(contents)')
+          fi
+          echo "$TAG_ANNOTATION"
+          echo "::set-output name=annotation::$TAG_ANNOTATION"
+
       # tag format: trigger-v2023-06-01-0915
       - name: Get triggered tag
         id: trigger_tag
@@ -99,7 +110,7 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MSG_AUTHOR: ''
           SLACK_TITLE: ''
-          SLACK_CHANNEL: 'test'
+          SLACK_CHANNEL: 'nugu_renewal'
           SLACK_MESSAGE: ${{ steps.slack_body.outputs.body }}
           SLACK_USERNAME: ${{ github.actor }}
           SLACK_ICON: 'https://image.lexica.art/full_jpg/340b0fc2-c10a-471b-84f8-271d252b7704'
