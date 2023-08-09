@@ -18,5 +18,3 @@ def main(*args, **kwargs):
 if __name__ == '__main__':
     main()
 
-messge = {"attachments": [{"color": "#36a64f", "blocks": [
-    {"type": "section", "text": {"type": "mrkdwn", "text": "${{ steps.slack_body.outputs.body }}"}}]}]}
