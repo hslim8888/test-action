@@ -18,24 +18,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: print PROVIDED_TAG
-        run: |
-          echo ${{ env.PROVIDED_TAG }}
-
-      - name: Get tag annotation
-        id: tag
-        run: |
-          if [ -z "${PROVIDED_TAG}" ]; then
-            TAG_ANNOTATION=$(git for-each-ref "${GITHUB_REF}" --format '%(contents)')
-          else            
-            TAG_ANNOTATION=$(git for-each-ref "refs/tags/${PROVIDED_TAG}" --format '%(contents)')
-          fi
-          echo "$TAG_ANNOTATION"
-          echo "::set-output name=annotation::$TAG_ANNOTATION"
-      - name: print annotation
-        run: |
-          echo ${{ steps.tag.outputs.annotation }}
-
       # tag format: trigger-v2023-06-01-0915
       - name: Get triggered tag
         id: trigger_tag
@@ -71,42 +53,38 @@ jobs:
         run: |
           echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/mediquitous-dev/zelda/commit/%h) - %s</br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
 
-#      - name: Create GitHub release
-#        uses: ncipollo/release-action@v1
-#        with:
-#          tag: ${{ steps.new.outputs.tag }}
-#          name: Release ${{ steps.new.outputs.tag }}
-#          makeLatest: true
-#          body: >
-#            [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
-#            <br/>
-#            <br/>
-#            <b>PR LIST</b>
-#            <br/>
-#            ${{ steps.pr_list.outputs.pr_list }}
-#            <br/>
-#            <br/>
-#            <br/>
-#            <b>CHANGELOG</b>
-#            <br/>
-#            ${{ steps.changelog.outputs.changelog }}
-#            <br/>
-#            deployed by @${{ github.actor }}
+      - name: Create GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.new.outputs.tag }}
+          name: Release ${{ steps.new.outputs.tag }}
+          makeLatest: true
+          body: >
+            [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
+            <br/>
+            <br/>
+            <b>PR LIST</b>
+            <br/>
+            ${{ steps.pr_list.outputs.pr_list }}
+            <br/>
+            <br/>
+            <br/>
+            <b>CHANGELOG</b>
+            <br/>
+            ${{ steps.changelog.outputs.changelog }}
+            <br/>
+            deployed by @${{ github.actor }}
 
       - name: slack body
         id: slack_body
         run: |
-          annotation="${{ steps.tag.outputs.annotation }}"
           tag="${{ steps.new.outputs.tag }}"
           release_url="https://github.com/mediquitous-dev/zelda/releases/tag/${tag}"
           pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk -F '\t' '{print $0}')
           pr_list="${pr_list//$'\n'/'%0A'}"  
           log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
           log="${log//$'\n'/'%0A'}"
-          body="*www.nugu.jp 에 배포가 완료되었습니다. <${release_url}|${tag}>*%0A%0A"
-          if [[ -n "$annotation" ]]; then
-            body+="*${annotation}*%0A%0A"
-          fi
+          body="*www.nugu.jp 에 배포가 완료되었습니다. <${release_url}|${tag}>*%0A%0A "
           if [ -n "$pr_list" ]; then
             body+="${pr_list}%0A%0A"
           fi
