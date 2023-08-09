@@ -62,27 +62,27 @@ jobs:
         run: |
           echo ::set-output name=changelog::$(git log --pretty=format:"[%h](https://github.com/mediquitous-dev/zelda/commit/%h) - %s</br>" ${{ steps.latest_log.outputs.commit }}..${{ steps.new.outputs.commit }})
 
-      - name: Create GitHub release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.new.outputs.tag }}
-          name: Release ${{ steps.new.outputs.tag }}
-          makeLatest: true
-          body: >
-            [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
-            <br/>
-            <br/>
-            <b>PR LIST</b>
-            <br/>
-            ${{ steps.pr_list.outputs.pr_list }}
-            <br/>
-            <br/>
-            <br/>
-            <b>CHANGELOG</b>
-            <br/>
-            ${{ steps.changelog.outputs.changelog }}
-            <br/>
-            deployed by @${{ github.actor }}
+#      - name: Create GitHub release
+#        uses: ncipollo/release-action@v1
+#        with:
+#          tag: ${{ steps.new.outputs.tag }}
+#          name: Release ${{ steps.new.outputs.tag }}
+#          makeLatest: true
+#          body: >
+#            [Compare link](https://github.com/mediquitous-dev/zelda/compare/${{ steps.latest_log.outputs.tag }}...${{ steps.new.outputs.tag }})
+#            <br/>
+#            <br/>
+#            <b>PR LIST</b>
+#            <br/>
+#            ${{ steps.pr_list.outputs.pr_list }}
+#            <br/>
+#            <br/>
+#            <br/>
+#            <b>CHANGELOG</b>
+#            <br/>
+#            ${{ steps.changelog.outputs.changelog }}
+#            <br/>
+#            deployed by @${{ github.actor }}
 
       - name: slack body
         id: slack_body
@@ -94,8 +94,8 @@ jobs:
           pr_list="${pr_list//$'\n'/'%0A'}"  
           log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
           log="${log//$'\n'/'%0A'}"
-          body="*www.nugu.jp 에 배포가 완료되었습니다. <${release_url}|${tag}>*%0A%0A "
-          if [[ -n "$annotation"]]; then
+          body="*www.nugu.jp 에 배포가 완료되었습니다. <${release_url}|${tag}>*%0A%0A"
+          if [[ -n "$annotation" ]]; then
             body+="*${annotation}*%0A%0A"
           fi
           if [ -n "$pr_list" ]; then
