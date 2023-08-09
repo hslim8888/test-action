@@ -104,11 +104,15 @@ jobs:
           fi
           echo "::set-output name=body::$body"
 
+      - name: print body
+        run: |
+          echo "${{ steps.slack_body.outputs.body }}"
+
       - name: Notify Slack
         uses: Ilshidur/action-slack@2.0.2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_CHANNEL: 'test'
           SLACK_USERNAME: ${{ github.actor }}
-          SLACK_CUSTOM_PAYLOAD: '{"username": ${{ github.actor }},"attachments": [{"color": "#36a64f","blocks": [{"type": "section","text": {"type": "mrkdwn","text": "asdfasdfdsasdf"}}]}]}'
+          SLACK_CUSTOM_PAYLOAD: '{"username": "${{ github.actor }}","attachments": [{"color": "#36a64f","blocks": [{"type": "section","text": {"type": "mrkdwn","text": "asdfasdfdsasdf"}}]}]}'
 
