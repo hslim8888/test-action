@@ -95,14 +95,14 @@ jobs:
           pr_list="${pr_list//$'\n'/'%0A'}"  
           log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
           log="${log//$'\n'/'%0A'}"
-          body="*www.nugu.jp 에 배포가 완료되었습니다.\\n\\n"
-          if [ -n "$pr_list" ]; then
-            body+="${pr_list}\\n\\n"
-          fi
-          if [ -n "$log" ]; then
-            body+="${log}\\n\\n"
-          fi
+          body="*www.nugu.jp 에 배포가 완료되었습니다.<${release_url}|${tag}>"
           echo "::set-output name=body::$body"
+#          if [ -n "$pr_list" ]; then
+#            body+="${pr_list}\\n\\n"
+#          fi
+#          if [ -n "$log" ]; then
+#            body+="${log}\\n\\n"
+#          fi
 
       - name: print body
         run: |
@@ -114,5 +114,5 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_CHANNEL: 'test'
           SLACK_USERNAME: ${{ github.actor }}
-          SLACK_CUSTOM_PAYLOAD: '{"username": "${{ github.actor }}","attachments": [{"color": "#36a64f","blocks": [{"type": "section","text": {"type": "mrkdwn","text": "asdfasdfdsasdf"}}]}]}'
+          SLACK_CUSTOM_PAYLOAD: '{"username": "${{ github.actor }}","attachments": [{"color": "#36a64f","blocks": [{"type": "section","text": {"type": "mrkdwn","text": "${{ steps.slack_body.outputs.body }}"}}]}]}'
 
