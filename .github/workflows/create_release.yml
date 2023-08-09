@@ -93,7 +93,10 @@ jobs:
           release_url="https://github.com/mediquitous-dev/zelda/releases/tag/${tag}"
           pr_list=$(echo "${{ steps.pr_list.outputs.pr_list }}" | head -n 2 | awk -F '\t' '{print $0}')
           pr_list="${pr_list//$'\n'/'%0A'}"  
-          log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
+#          log=$(git log --pretty=format:'%h - %s' | head -n 3 | awk -F '\t' '{print $0}')
+          log=$(git log --pretty=format:'%h - %s' | head -n 3')
+          echo $log
+#          log="${log//$'\n'/'%0A'}"
           body="*www.nugu.jp 에 배포가 완료되었습니다. <${release_url}|${tag}>*"
           if [ -n "$pr_list" ]; then
             body+="${pr_list}\\n\\n"
