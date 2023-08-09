@@ -105,14 +105,16 @@ jobs:
           echo "::set-output name=body::$body"
 
       - name: Notify Slack
-        uses: rtCamp/action-slack-notify@v2
+        uses: 8398a7/action-slack@v3
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MSG_AUTHOR: 'a'
-          SLACK_TITLE: 'a'
-          SLACK_CHANNEL: 'test'
-          SLACK_MESSAGE: ${{ steps.slack_body.outputs.body }}
-          SLACK_USERNAME: ${{ github.actor }}
-          SLACK_ICON: 'https://image.lexica.art/full_jpg/340b0fc2-c10a-471b-84f8-271d252b7704'
-          SLACK_FOOTER: ''
-          MSG_MINIMAL: true
+        with:
+          status: custom
+          custom_payload: |
+            {
+                attachments: [{
+                    "author_name": "${{ github.actor }}",
+                    color: 'good',
+                    text: '${{ steps.slack_body.outputs.body }}',
+                }]
+            }
