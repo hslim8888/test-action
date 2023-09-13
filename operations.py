@@ -24,7 +24,7 @@ def create_release_and_notify_slack():
     <br>
     <b>CHANGE LOG</b>
     {change_log}
-    """.replace("`", "\`")
+    """
     sh(f'gh release create {new_tag} --title="Release {new_tag}" --notes="{release_note}"')
 
 def tag_latest_commit(new_tag):
