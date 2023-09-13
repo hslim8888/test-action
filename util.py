@@ -1,3 +1,4 @@
+import re
 import subprocess
 from datetime import datetime, timedelta
 
@@ -6,7 +7,7 @@ import pytz
 
 def sh(command, check=False, capture_output=False):
     print(command)
-    return subprocess.run(command, shell=True, check=check, capture_output=capture_output,
+    return subprocess.run(re.escape(command), shell=True, check=check, capture_output=capture_output,
                           text=True if capture_output else False)
 
 
