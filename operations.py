@@ -31,7 +31,6 @@ def create_release_and_notify_slack():
     release_note = message_template.render(title=release_title, pr_list=pr_list, change_log=change_log)
 
 
-
     print('release_note!!!', release_note)
     # release_note = textwrap.dedent(f"""\
     #     [Compare link](https://github.com/mediquitous-dev/zelda/compare/{previous_tag}..{new_tag})
