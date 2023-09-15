@@ -1,4 +1,5 @@
 import json
+import textwrap
 from datetime import datetime
 
 from pyinfra.operations import python
@@ -16,16 +17,22 @@ def create_release_and_notify_slack():
     pr_list = sh_output(f'gh pr list --search "is:merged merged:{previous_time}..{new_time}" --json number,title')
     pr_list = "\n".join([f"#{item['number']} {item['title']}" for item in json.loads(pr_list) if pr_list])
 
-    github_name = sh_output('git config user.name')
-    release_note = f"""[Compare link](https://github.com/mediquitous-dev/zelda/compare/{previous_tag}..{new_tag})
-    <br>
-    <b>PR LIST</b>
-    {pr_list}
-    <br>
-    <b>CHANGE LOG</b>
-    {change_log}
-    """
+    release_note = textwrap.dedent(f"""\
+        [Compare link](https://github.com/mediquitous-dev/zelda/compare/{previous_tag}..{new_tag})
+        <br>
+        <b>PR LIST</b>
+        {pr_list}
+        <br>
+        <b>CHANGE LOG</b>
+        {change_log}
+    """)
     sh(f'gh release create {new_tag} --title="Release {new_tag}" --notes="{release_note}"')
+
+    slack_message = textwrap.dedent(f"""\
+        *www.nugu.jp 배포가 완료되었습니다. <https://github.com/mediquitous-dev/zelda/releases/tag/{new_tag}|{new_tag}>*
+
+    """)
+    print('slack_message!!!', slack_message)
 
 def tag_latest_commit(new_tag):
     sh('git fetch')

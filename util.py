@@ -7,12 +7,13 @@ import pytz
 
 def sh(command, check=False, capture_output=False):
     print(command)
-    return subprocess.run(re.escape(command), shell=True, check=check, capture_output=capture_output,
+    return subprocess.run(command.replace('`', '\`'), shell=True, check=check, capture_output=capture_output,
                           text=True if capture_output else False)
 
 
 def sh_output(command, check=False) -> str:
     return sh(command, check=check, capture_output=True).stdout.strip()
+
 
 def get_commit_hash_and_time_from_tag(tag):
     comit_hash = sh_output(f'git show-ref -s {tag}')
